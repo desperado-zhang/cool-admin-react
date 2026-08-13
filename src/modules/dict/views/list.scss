@@ -1,0 +1,60 @@
+.dict-list {
+	display: flex;
+	height: 100%;
+	background: #fff;
+	border-radius: 6px;
+	overflow: hidden;
+
+	&__left {
+		width: 220px;
+		border-right: 1px solid #e4e7ed;
+		display: flex;
+		flex-direction: column;
+	}
+
+	&__header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		height: 40px;
+		padding: 0 10px;
+		border-bottom: 1px solid #e4e7ed;
+		user-select: none;
+	}
+
+	&__types {
+		flex: 1;
+		overflow: auto;
+		padding: 6px;
+	}
+
+	&__type {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		height: 34px;
+		padding: 0 10px;
+		border-radius: 6px;
+		cursor: pointer;
+		font-size: 13px;
+
+		&:hover {
+			background: #f5f7fa;
+		}
+
+		&.is-active {
+			background: #e6f0ff;
+			color: #1668dc;
+		}
+	}
+
+	&__right {
+		flex: 1;
+		overflow: auto;
+
+		.cl-crud {
+			height: auto;
+			min-height: 100%;
+		}
+	}
+}

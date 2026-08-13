@@ -12,8 +12,8 @@
 |---|---|
 | 项目名 | cool-admin-react |
 | 目标 | React + AntD 复刻管理端前端，协议不变、后端零改动，与 Vue 版行为一致、可插拔替换 |
-| 当前阶段 | W3 完成：base 模块 8 页面全部实现（用户/角色/菜单/部门/参数/日志/个人中心/工作台），浏览器实测通过 |
-| 最近更新 | 2026-08-13（W3 base 页面） |
+| 当前阶段 | W3+W4 完成：**17 页面全部实现**，浏览器实测通过 |
+| 最近更新 | 2026-08-13（W4 其余模块） |
 | 远端仓库 | git@github.com:desperado-zhang/cool-admin-react.git |
 | 上游进度 | cool-admin-nest 一期全量完成（P0-P4：EPS 118/118、22 表对齐、17 页走查） |
 
@@ -25,7 +25,7 @@
 | W1 框架 | 登录链路 + 主布局 + 动态路由（menus→routes）+ 权限组件 + EPS service 层 | 登录后菜单/路由/按钮权限正常 | 🚧 T1.1-T1.5 ✅；T1.6 i18n/T1.7 主题 ⬜ |
 | W2 CRUD 组件 | CoolTable / CoolForm / CoolDialog（对应 cl-crud 核心能力） | 配置式驱动 CRUD 页面 | ✅ 2026-08-13（参数配置页端到端实测） |
 | W3 base 页面 | 登录/工作台/用户/角色/菜单/部门/参数/日志/个人中心 | 与 Vue 版逐页行为一致 | ✅ 2026-08-13（8 页面浏览器实测） |
-| W4 其余模块 | dict/recycle/space/task/user/helper/demo | 17 页面全部渲染 | ⬜ |
+| W4 其余模块 | dict/recycle/space/task/user/helper/demo | 17 页面全部渲染 | ✅ 2026-08-13（7 页面浏览器实测） |
 | P 对齐 | 与 Vue 版逐页比对 + Docker 替换 admin-ui + 验收清单 | 本仓库验收标准 6 项全过 | ⬜ |
 
 ## 三、任务清单
@@ -69,15 +69,15 @@
 | T3.5 | 部门管理（树形/拖拽排序） | ✅ 2026-08-13 | 与用户页左侧组织架构共用（种子菜单 /sys/department 指向用户页，与 Vue 一致） |
 | T3.6 | 参数配置 / 操作日志 / 个人中心 | ✅ 2026-08-13 | 参数配置（W2 验收页）；日志（清空/保存天数 getKeep+setKeep/keyword）；个人中心（头像上传/昵称/改密 personUpdate） |
 
-### W4：其余模块（⬜）
+### W4：其余模块
 | # | 页面 | 状态 | 备注 |
 |---|---|---|---|
-| T4.1 | dict 字典管理 | ⬜ | |
-| T4.2 | recycle 回收站 | ⬜ | |
-| T4.3 | space 云空间 | ⬜ | |
-| T4.4 | task 定时任务 | ⬜ | |
-| T4.5 | user 用户模块 | ⬜ | |
-| T4.6 | helper（AI 编码/插件）+ demo（CRUD 示例/首页演示） | ⬜ | |
+| T4.1 | dict 字典管理 | ✅ 2026-08-13 | 左侧类型列表（增改）+ 右侧数据树形表格（typeId 过滤/slot-add 子集新增/刷新字典缓存）；U5 规避：排序发 order/sort |
+| T4.2 | recycle 回收站 | ✅ 2026-08-13 | 批量恢复/单行恢复（restore 契约） |
+| T4.3 | space 云空间 | ✅ 2026-08-13 | 简化版：分类树 + 文件网格（多选删除/预览）+ 上传（upload 契约 file 字段） |
+| T4.4 | task 定时任务 | ✅ 2026-08-13 | 卡片式列表（进行中/已停止、启停/立即执行/日志/删除）+ cron/间隔表单联动 + 日志弹窗（task log 契约） |
+| T4.5 | user 用户模块 | ✅ 2026-08-13 | 用户信息 CRUD（性别/登录方式/状态字典） |
+| T4.6 | helper（AI 编码/插件）+ demo（CRUD 示例） | ✅ 2026-08-13 | 插件市场（plugin.info 分页卡片）；AI 编码（coding getModuleTree/createCode）；CRUD 示例（demo.goods） |
 
 ### P：对齐验收（⬜）
 | # | 任务 | 状态 | 备注 |
@@ -118,9 +118,16 @@
 | 2026-08-13 | T1.5 EPS 服务层 | ego-browser 页面内动态 import 实测：user.page({page:1,size:20})→{list,pagination}、menu.list()→7、dict.type.list()→2、自定义接口 move/clear 绑定、权限码 map（base:sys:user:add 等） | ✅ 全通过 |
 | 2026-08-13 | W2 CRUD 框架 | ego-browser 参数配置页端到端：列表渲染（3 条+字典映射+popover 数据预览）→ 新增（radio 联动 hidden 字段/onSubmit 转换）→ 编辑（info 回填+onOpened 映射）→ 删除（确认+刷新）→ 关键字/类型筛选、分页 | ✅ 全通过（期间修复 2 框架 bug：useRoutes 条件调用致 hook 顺序错误、lazy 组件缺 Suspense） |
 | 2026-08-13 | W3 base 页面 | ego-browser 8 页面逐页实测：用户页（组织架构树 3 节点/新增用户含角色动态加载/状态开关内联 update/转移弹窗+部门树选择器）、角色页、日志页、菜单页（树形表格 7 展开/新增弹窗含图标选择器）、个人中心、参数页、工作台（统计卡+图表）、部门树右键菜单 | ✅ 全通过（期间修复：deepTree 兼容树形输入、首页 index 路由 Navigate 自循环；发现上游缺口 U4/U5） |
+| 2026-08-13 | W4 其余模块 | ego-browser 7 页面实测：字典（类型列表+树表）、回收站、云空间（分类+文件网格）、定时任务（卡片列表+日志弹窗）、用户模块、插件市场、CRUD 示例 | ✅ 全部渲染通过 |
 
 ## 七、下一个动作
 
-1. **W4 其余模块**（T4.1-T4.6）：dict 字典管理（类型 tabs + 数据树表）→ recycle 回收站 → space 云空间 → task 定时任务 → user 用户模块 → helper（AI 编码/插件）+ demo（CRUD 示例）；对照 Vue 版源码逐页移植
-2. **上游同步**：U4/U5 已写入本文件待确认项，需通知 cool-admin-nest 修复（user/page roleName+admin 排除+departmentIds、menu/list prop 提取）
+1. **P 对齐验收**（T5.1-T5.6）：
+   - T5.1 17 页面与 Vue 版逐页比对（egolite 实测，含弹窗/按钮级交互细节）
+   - T5.2 接口抓包 diff（出入参与 AGENTS.md 一致）
+   - T5.3 按钮级权限实测（非超管/越权 403）
+   - T5.4 token 生命周期实测（401 续期/改密失效/logout 作废）
+   - T5.5 EPS 全量消费比对（eps.snapshot.json）
+   - T5.6 Docker 可插拔替换 admin-ui 容器实测
+2. **上游同步**：U4/U5 已写入两仓库 PROGRESS（nest 待修复）
 3. 每任务验收后更新本文件与 `../cool-admin-nest/PROGRESS.md`（二期行）
