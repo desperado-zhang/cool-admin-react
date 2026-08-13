@@ -7,7 +7,7 @@
  */
 import { create } from "zustand";
 import { storage } from "../utils/storage";
-import { service } from "../service/api";
+import { service } from "../service";
 import type { TokenResult, UserInfo } from "../types";
 import { useMenuStore } from "./menu";
 import { useProcessStore } from "./process";

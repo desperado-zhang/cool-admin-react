@@ -12,7 +12,7 @@
 |---|---|
 | 项目名 | cool-admin-react |
 | 目标 | React + AntD 复刻管理端前端，协议不变、后端零改动，与 Vue 版行为一致、可插拔替换 |
-| 当前阶段 | W1 完成：登录链路 + 主布局 + 动态路由 + 守卫（浏览器实测通过） |
+| 当前阶段 | W1 完成：登录链路 + 主布局 + 动态路由 + EPS 服务层（浏览器实测通过） |
 | 最近更新 | 2026-08-13（W1 登录/布局/动态路由） |
 | 远端仓库 | git@github.com:desperado-zhang/cool-admin-react.git |
 | 上游进度 | cool-admin-nest 一期全量完成（P0-P4：EPS 118/118、22 表对齐、17 页走查） |
@@ -22,7 +22,7 @@
 | 里程碑 | 内容 | 验收标准 | 状态 |
 |---|---|---|---|
 | W0 准备 | 仓库骨架、文档、构建工具链、契约层骨架 | 可构建、可推送 | ✅ 2026-08-13 |
-| W1 框架 | 登录链路 + 主布局 + 动态路由（menus→routes）+ 权限组件 + EPS service 层 | 登录后菜单/路由/按钮权限正常 | 🚧 T1.1-T1.4 ✅；T1.5 EPS/T1.6 i18n/T1.7 主题 ⬜ |
+| W1 框架 | 登录链路 + 主布局 + 动态路由（menus→routes）+ 权限组件 + EPS service 层 | 登录后菜单/路由/按钮权限正常 | 🚧 T1.1-T1.5 ✅；T1.6 i18n/T1.7 主题 ⬜ |
 | W2 CRUD 组件 | CoolTable / CoolForm / CoolDialog（对应 cl-crud 核心能力） | 配置式驱动 CRUD 页面 | ⬜ |
 | W3 base 页面 | 登录/工作台/用户/角色/菜单/部门/参数/日志/个人中心 | 与 Vue 版逐页行为一致 | ⬜ |
 | W4 其余模块 | dict/recycle/space/task/user/helper/demo | 17 页面全部渲染 | ⬜ |
@@ -46,7 +46,7 @@
 | T1.2 | 主布局（侧边菜单/顶栏/页签/个人中心下拉） | — | ✅ 2026-08-13 | 侧边栏（logo/搜索/菜单树）+ 顶栏（折叠/面包屑/用户下拉）+ 页签栏 + 内容区；样式复刻 Vue 版（#2c3147 侧栏） |
 | T1.3 | 动态路由：登录 → permmenu → deepTree 菜单 → filter(type==1) 路由注册 | 4.1 | ✅ 2026-08-13 | **修复 bug**：首页路径误从扁平列表取（应组树），致 用户列表 被误标 isHome；组树后正确。扁平数组契约 ✓ |
 | T1.4 | 路由守卫（无 token 跳登录 / 404 / 工作台重定向） | — | ✅ 2026-08-13 | Layout 守卫 + 登录页已登录回跳 + 401/403/404/500/502 页面 |
-| T1.5 | EPS vite 插件：构建期注入 EPS → 生成 service 层 | 8.x | ⬜ | 当前 service 为手写（base.open/comm）；页面模块需 EPS 全量生成 |
+| T1.5 | EPS vite 插件：构建期注入 EPS → 生成 service 层 | 8.x | ✅ 2026-08-13 | U3 决策：**虚拟模块 + 提交生成 d.ts**（见 ADR D4）。`virtual:eps` 构建期注入；`service.base.sys.user.page()` 全量可用（20 实体/119 接口）；权限码 map（base:sys:user:add 等）；`pnpm eps` 重新生成；后端加接口 → pnpm eps + 重建 bundle |
 | T1.6 | i18n（zh-CN/en-US，AntD locale 联动） | — | ⬜ | 当前硬编码中文；AntD zhCN 已接 |
 | T1.7 | 主题（暗色切换/主色） | — | ⬜ | colorPrimary #1668dc 已设；暗色切换未做 |
 
@@ -94,7 +94,7 @@
 |---|---|---|---|
 | U1 | React 版富文本编辑器选型（对应 wangeditor） | ⬜ | 参数配置页 html 编辑需要 |
 | U2 | 图标体系：官方菜单 icon 字符串（如 icon-setting）→ AntD 图标映射 | 🚧 | `src/cool/components/icon.tsx` 已建映射表（19 项，覆盖种子菜单全部 icon）；后续新菜单 icon 需补充 |
-| U3 | EPS vite 插件实现方式（虚拟模块 vs 代码生成） | ⬜ | T1.5 时决策 |
+| U3 | EPS vite 插件实现方式（虚拟模块 vs 代码生成） | ✅ 2026-08-13 | **虚拟模块（构建期注入）+ 提交生成 d.ts**（ADR D4）；缓存兜底链：远程 → node_modules/.cache → build/cool/eps.json（种子，已提交） |
 
 ## 五、决策记录（ADR）
 
@@ -103,6 +103,7 @@
 | D1 | 技术栈 | React 18 + AntD 5 + react-router v6 + zustand + axios + i18next + echarts | 2026-08-13 |
 | D2 | 复刻策略 | 结构镜像 Vue 版（src/cool 核心 + src/modules 页面一一对应），行为逐页比对 | 2026-08-13 |
 | D3 | 契约层先行 | 请求层/状态/树工具按契约实现后再做页面（对应 W0） | 2026-08-13 |
+| D4 | EPS 注入方案 | vite 虚拟模块（virtual:eps 构建期注入，对齐 Vue @cool-vue/vite-plugin）+ 生成 d.ts 提交仓库；缓存兜底链：远程 → node_modules/.cache → build/cool/eps.json 种子；`pnpm eps` 独立再生成；后端加接口须 pnpm eps + 重建 bundle（对齐 nest D10） | 2026-08-13 |
 
 ## 六、验收记录
 
@@ -111,9 +112,9 @@
 | 2026-08-13 | W0 骨架 | pnpm install + tsc -b + vite build 通过；远端推送成功 | ✅ |
 | 2026-08-13 | W1 登录链路 | ego-browser 实测：登录页渲染（验证码 svg）→ 登录 → person + permmenu → 首页布局（侧边菜单树/顶栏/页签）→ 菜单点击跳转 /sys/user → iframe 菜单（文档官网）→ 退出登录确认 → 回登录页 → 刷新 /sys/user 恢复 | ✅ 全部通过（期间修复 1 bug：首页路径误从扁平列表取，见 T1.3） |
 | 2026-08-13 | W1 菜单结构 | 侧边菜单与官方 seed 比对：首页/系统管理(权限管理/参数配置/监控管理/任务管理)/数据管理/扩展管理/用户管理/框架教程，图标映射正确 | ✅ |
+| 2026-08-13 | T1.5 EPS 服务层 | ego-browser 页面内动态 import 实测：user.page({page:1,size:20})→{list,pagination}、menu.list()→7、dict.type.list()→2、自定义接口 move/clear 绑定、权限码 map（base:sys:user:add 等） | ✅ 全通过 |
 
 ## 七、下一个动作
 
-1. **T1.5 EPS vite 插件**（决策 U3：虚拟模块 vs 代码生成）：对照 @cool-vue/vite-plugin，构建期注入 EPS → 生成 `service.base.sys.*` 等全量服务层；后端加接口须重建 bundle
-2. **W2 CRUD 组件**（T2.1-T2.4）：CoolTable / CoolForm / CoolDialog / Permission 组件，配置式驱动页面（对应 cl-crud）
-3. 每任务验收后更新本文件与 `../cool-admin-nest/PROGRESS.md`（二期行）
+1. **W2 CRUD 组件**（T2.1-T2.4）：CoolTable / CoolForm / CoolDialog / Permission 组件，配置式驱动页面（对应 cl-crud），参考 `../cool-admin-nest/apps/admin-ui/node_modules/@cool-vue/crud`
+2. 每任务验收后更新本文件与 `../cool-admin-nest/PROGRESS.md`（二期行）

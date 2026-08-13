@@ -1,10 +1,12 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { fileURLToPath, URL } from "node:url";
+// @ts-expect-error 纯 mjs 插件
+import { coolEpsPlugin } from "./build/eps/plugin.mjs";
 
 // https://vite.dev/config/
 export default defineConfig({
-	plugins: [react()],
+	plugins: [coolEpsPlugin(), react()],
 	resolve: {
 		alias: {
 			"@": fileURLToPath(new URL("./src", import.meta.url))

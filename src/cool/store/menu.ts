@@ -7,7 +7,7 @@
  * - 首个 type=1 菜单为首页（isHome），'/' 重定向到它
  */
 import { create } from "zustand";
-import { service } from "../service/api";
+import { service } from "../service";
 import { deepTree } from "../utils/tree";
 import { resolveViewElement } from "../router/view-loader";
 import type { MenuItem, PermMenuResult } from "../types";

@@ -6,7 +6,7 @@
 import { useRef, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { App, Button, Form, Input } from "antd";
-import { service } from "@/cool/service/api";
+import { service } from "@/cool/service";
 import { useUserStore } from "@/cool/store/user";
 import { useMenuStore } from "@/cool/store/menu";
 import { useAppStore } from "@/cool/store/app";

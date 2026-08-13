@@ -9,7 +9,7 @@ import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
 import { useAppStore } from "@/cool/store/app";
 import { useUserStore } from "@/cool/store/user";
 import { useMenuStore, type FormattedMenu } from "@/cool/store/menu";
-import { service } from "@/cool/service/api";
+import { service } from "@/cool/service";
 
 export default function Topbar() {
 	const navigate = useNavigate();

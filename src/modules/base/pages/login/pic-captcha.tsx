@@ -4,7 +4,7 @@
  */
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { App, Spin } from "antd";
-import { service } from "@/cool/service/api";
+import { service } from "@/cool/service";
 
 export interface PicCaptchaRef {
 	refresh: () => Promise<void>;
