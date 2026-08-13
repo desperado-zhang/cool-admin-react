@@ -47,6 +47,9 @@ function AppRoot() {
 
 	const routes = useMemo(() => buildRoutes(), [ready, token]);
 
+	// useRoutes 必须无条件调用（hooks 顺序固定）
+	const element = useRoutes(routes);
+
 	// 首次加载中
 	if (token && !ready) {
 		return (
@@ -64,5 +67,5 @@ function AppRoot() {
 		);
 	}
 
-	return useRoutes(routes);
+	return element;
 }

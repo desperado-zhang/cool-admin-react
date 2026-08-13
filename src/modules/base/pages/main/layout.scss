@@ -38,6 +38,18 @@
 		box-sizing: border-box;
 		border-radius: 6px;
 		position: relative;
+
+		> * {
+			height: 100%;
+		}
+	}
+
+	.cl-crud {
+		padding: 10px;
+		background: #fff;
+		border-radius: 6px;
+		height: 100%;
+		box-sizing: border-box;
 	}
 }
 

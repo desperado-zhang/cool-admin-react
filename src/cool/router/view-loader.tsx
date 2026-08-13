@@ -5,11 +5,21 @@
  * - 'http(s)://...' → iframe（Frame 组件）
  * - 组件未实现 → 开发中占位页（页面完成后自动生效）
  */
-import { lazy, type ReactNode } from "react";
+import { lazy, Suspense, type ReactNode } from "react";
+import { Spin } from "antd";
 import Frame from "../components/frame";
 import Placeholder from "../components/placeholder";
 
 const views = import.meta.glob("/src/modules/*/views/**/*.tsx");
+
+/** Suspense 兜底 */
+function PageLoading() {
+	return (
+		<div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+			<Spin />
+		</div>
+	);
+}
 
 export function resolveViewElement(viewPath?: string | null): ReactNode {
 	if (!viewPath) {
@@ -30,5 +40,9 @@ export function resolveViewElement(viewPath?: string | null): ReactNode {
 	}
 
 	const Comp = lazy(loader as () => Promise<{ default: React.ComponentType }>);
-	return <Comp />;
+	return (
+		<Suspense fallback={<PageLoading />}>
+			<Comp />
+		</Suspense>
+	);
 }

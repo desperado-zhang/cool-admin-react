@@ -23,7 +23,7 @@
 |---|---|---|---|
 | W0 准备 | 仓库骨架、文档、构建工具链、契约层骨架 | 可构建、可推送 | ✅ 2026-08-13 |
 | W1 框架 | 登录链路 + 主布局 + 动态路由（menus→routes）+ 权限组件 + EPS service 层 | 登录后菜单/路由/按钮权限正常 | 🚧 T1.1-T1.5 ✅；T1.6 i18n/T1.7 主题 ⬜ |
-| W2 CRUD 组件 | CoolTable / CoolForm / CoolDialog（对应 cl-crud 核心能力） | 配置式驱动 CRUD 页面 | ⬜ |
+| W2 CRUD 组件 | CoolTable / CoolForm / CoolDialog（对应 cl-crud 核心能力） | 配置式驱动 CRUD 页面 | ✅ 2026-08-13（参数配置页端到端实测） |
 | W3 base 页面 | 登录/工作台/用户/角色/菜单/部门/参数/日志/个人中心 | 与 Vue 版逐页行为一致 | ⬜ |
 | W4 其余模块 | dict/recycle/space/task/user/helper/demo | 17 页面全部渲染 | ⬜ |
 | P 对齐 | 与 Vue 版逐页比对 + Docker 替换 admin-ui + 验收清单 | 本仓库验收标准 6 项全过 | ⬜ |
@@ -50,13 +50,14 @@
 | T1.6 | i18n（zh-CN/en-US，AntD locale 联动） | — | ⬜ | 当前硬编码中文；AntD zhCN 已接 |
 | T1.7 | 主题（暗色切换/主色） | — | ⬜ | colorPrimary #1668dc 已设；暗色切换未做 |
 
-### W2：CRUD 组件（⬜）
+### W2：CRUD 组件
 | # | 任务 | 状态 | 备注 |
 |---|---|---|---|
-| T2.1 | CoolTable：分页/搜索/排序/工具栏/选择/字典渲染 | ⬜ | 对应 cl-crud cl-table |
-| T2.2 | CoolForm：动态表单/校验/组件联动 | ⬜ | 对应 cl-crud cl-form |
-| T2.3 | CoolDialog：新增/编辑弹窗上下文 | ⬜ | 对应 cl-upsert |
-| T2.4 | `<Permission>` 组件 / usePermission 接入按钮 | ⬜ | 对应 v-permission |
+| T2.1 | CoolTable：分页/搜索/排序/工具栏/选择/字典渲染 | ✅ 2026-08-13 | 列配置对齐 Vue（selection/index/op/component/formatter/dict/sortable）；op 列 edit/delete/slot-xxx；服务端排序 order/sort；单元格内联更新（cl-switch→update+refresh） |
+| T2.2 | CoolForm：动态表单/校验/组件联动 | ✅ 2026-08-13 | items 对齐 Vue（函数式 item/span/required/rules/value）；hidden({scope}) 表单值联动；动态 options（对应 setOptions） |
+| T2.3 | CoolDialog：新增/编辑弹窗上下文 | ✅ 2026-08-13 | 编辑默认 service.info 拉取合并（对齐 Vue getInfo）；onInfo/onOpened/onSubmit({next}) 钩子；成功刷新列表 |
+| T2.4 | `<Permission>` 组件 / usePermission 接入按钮 | ✅ 2026-08-13 | 组件已实现（admin 豁免）；页面级接入随 W3 用户页实测 |
+| T2.5 | 组件注册表 + 字典 store + 工具栏组件 | ✅ 2026-08-13 | el-input/select/radio/switch/checkbox/date/tree-select、cl-select/avatar/image/code-json/upload/editor、slot-value；dict store 启动 refresh + get/find；Refresh/Add/MultiDelete/SearchKey/SearchSelect/Flex1/Pagination |
 
 ### W3：base 页面（⬜）
 | # | 页面 | 状态 | 备注 |
@@ -113,8 +114,9 @@
 | 2026-08-13 | W1 登录链路 | ego-browser 实测：登录页渲染（验证码 svg）→ 登录 → person + permmenu → 首页布局（侧边菜单树/顶栏/页签）→ 菜单点击跳转 /sys/user → iframe 菜单（文档官网）→ 退出登录确认 → 回登录页 → 刷新 /sys/user 恢复 | ✅ 全部通过（期间修复 1 bug：首页路径误从扁平列表取，见 T1.3） |
 | 2026-08-13 | W1 菜单结构 | 侧边菜单与官方 seed 比对：首页/系统管理(权限管理/参数配置/监控管理/任务管理)/数据管理/扩展管理/用户管理/框架教程，图标映射正确 | ✅ |
 | 2026-08-13 | T1.5 EPS 服务层 | ego-browser 页面内动态 import 实测：user.page({page:1,size:20})→{list,pagination}、menu.list()→7、dict.type.list()→2、自定义接口 move/clear 绑定、权限码 map（base:sys:user:add 等） | ✅ 全通过 |
+| 2026-08-13 | W2 CRUD 框架 | ego-browser 参数配置页端到端：列表渲染（3 条+字典映射+popover 数据预览）→ 新增（radio 联动 hidden 字段/onSubmit 转换）→ 编辑（info 回填+onOpened 映射）→ 删除（确认+刷新）→ 关键字/类型筛选、分页 | ✅ 全通过（期间修复 2 框架 bug：useRoutes 条件调用致 hook 顺序错误、lazy 组件缺 Suspense） |
 
 ## 七、下一个动作
 
-1. **W2 CRUD 组件**（T2.1-T2.4）：CoolTable / CoolForm / CoolDialog / Permission 组件，配置式驱动页面（对应 cl-crud），参考 `../cool-admin-nest/apps/admin-ui/node_modules/@cool-vue/crud`
+1. **W3 base 页面**（T3.1-T3.6）：工作台 dashboard → 用户列表（含部门树/角色分配/批量移动）→ 角色 → 菜单 → 部门 → 日志/个人中心；每页对照 Vue 版源码逐页移植 + ego-browser 实测
 2. 每任务验收后更新本文件与 `../cool-admin-nest/PROGRESS.md`（二期行）

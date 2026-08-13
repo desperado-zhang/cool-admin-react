@@ -28,7 +28,7 @@ export class BaseService {
 		return request({
 			...options,
 			url
-		});
+		}) as Promise<any>;
 	};
 
 	// 获取列表
