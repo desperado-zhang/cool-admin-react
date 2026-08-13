@@ -21,6 +21,8 @@ export interface CoolCrud {
 
 	/** 刷新列表（extra 合并进 params 并持久化） */
 	refresh: (extra?: Record<string, unknown>) => Promise<void>;
+	/** 自定义渲染列表（对应 Vue onRefresh 的 render，如菜单页用 list 树） */
+	render: (data: Record<string, unknown>[], total?: number) => void;
 	/** 分页变化 */
 	onPageChange: (page: number, size: number) => void;
 	/** 新增（带默认值） */
@@ -44,7 +46,14 @@ export function useCoolCrudContext() {
 	return crud;
 }
 
-export function useCoolCrud(options: { service: BaseService; autoRefresh?: boolean }): CoolCrud {
+export interface CoolCrudOptions {
+	service: BaseService;
+	autoRefresh?: boolean;
+	/** 自定义刷新（对应 Vue useCrud 的 onRefresh；默认走 page 接口） */
+	onRefresh?: (params: Record<string, unknown>, ctx: { render: (data: Record<string, unknown>[], total?: number) => void }) => void | Promise<void>;
+}
+
+export function useCoolCrud(options: CoolCrudOptions): CoolCrud {
 	const { message, modal } = App.useApp();
 	const service = options.service;
 
@@ -61,14 +70,28 @@ export function useCoolCrud(options: { service: BaseService; autoRefresh?: boole
 
 	const refresh = useCallback(
 		async (extra?: Record<string, unknown>) => {
-			const next = extra ? { ...stateRef.current.params, ...extra } : stateRef.current.params;
-			if (extra) setParams(next);
+			const merged = extra ? { ...stateRef.current.params, ...extra } : stateRef.current.params;
+			// page/size 由分页状态控制，不进入持久参数
+			delete merged.page;
+			delete merged.size;
+			if (extra) setParams(merged);
 
 			const { page, size } = stateRef.current.pagination;
 
+			// 自定义刷新（如菜单页用 list 树）
+			if (options.onRefresh) {
+				setLoading(true);
+				try {
+					await options.onRefresh(merged, { render });
+				} finally {
+					setLoading(false);
+				}
+				return;
+			}
+
 			setLoading(true);
 			try {
-				const data = await service.page({ page, size, ...next });
+				const data = await service.page({ page, size, ...merged });
 				setList(data?.list || []);
 				setPagination((p) => ({ ...p, total: data?.pagination?.total || 0 }));
 			} catch (err) {
@@ -77,7 +100,8 @@ export function useCoolCrud(options: { service: BaseService; autoRefresh?: boole
 				setLoading(false);
 			}
 		},
-		[service, message]
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[service, message, options.onRefresh]
 	);
 
 	const onPageChange = useCallback(
@@ -97,6 +121,11 @@ export function useCoolCrud(options: { service: BaseService; autoRefresh?: boole
 		},
 		[service, message]
 	);
+
+	const render = useCallback((data: Record<string, unknown>[], total?: number) => {
+		setList(data || []);
+		setPagination((p) => ({ ...p, total: total ?? (data || []).length }));
+	}, []);
 
 	const rowAppend = useCallback((data?: Record<string, unknown>) => {
 		setUpsert({ open: true, mode: "add", form: data || {} });
@@ -173,6 +202,7 @@ export function useCoolCrud(options: { service: BaseService; autoRefresh?: boole
 		setSelection,
 		upsert,
 		refresh,
+		render,
 		onPageChange,
 		rowAppend,
 		rowEdit,

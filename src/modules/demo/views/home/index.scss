@@ -1,0 +1,9 @@
+.demo-home {
+	overflow-x: hidden;
+	min-height: 100%;
+
+	&__card {
+		border-radius: 10px;
+		margin-bottom: 10px;
+	}
+}

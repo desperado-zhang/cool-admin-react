@@ -16,6 +16,8 @@ interface CoolFormProps {
 	mode: "add" | "edit";
 	/** 页面动态设置的选项（对应 Vue setOptions） */
 	options?: Record<string, DictOption[]>;
+	/** 表单插槽（component.name 为 slot-xxx 时渲染，对应 Vue 模板插槽） */
+	slots?: Record<string, (ctx: { value?: unknown; onChange?: (v: unknown) => void }) => React.ReactNode>;
 }
 
 /** 表单项的隐藏条件（对应 Vue item.hidden({ scope })） */
@@ -25,13 +27,24 @@ function FieldRenderer({
 	value,
 	onChange,
 	cfg,
-	options
+	options,
+	slots
 }: {
 	value?: unknown;
 	onChange?: (value: unknown) => void;
 	cfg: { name: string; props?: Record<string, unknown>; options?: DictOption[] };
 	options?: DictOption[];
+	slots?: CoolFormProps["slots"];
 }) {
+	// 插槽组件（slot-xxx）
+	if (cfg.name.startsWith("slot-")) {
+		const name = cfg.name.replace("slot-", "");
+		if (slots?.[name]) {
+			return slots[name]({ value, onChange });
+		}
+		return null;
+	}
+
 	const renderer = getComponent(cfg.name);
 
 	if (!renderer) {
@@ -47,7 +60,7 @@ function FieldRenderer({
 	});
 }
 
-export default function CoolForm({ form, items, mode, options }: CoolFormProps) {
+export default function CoolForm({ form, items, mode, options, slots }: CoolFormProps) {
 	const dictStore = useDictStore();
 
 	// 全表单值监听（item.hidden({ scope }) 联动）
@@ -87,7 +100,7 @@ export default function CoolForm({ form, items, mode, options }: CoolFormProps) 
 					return (
 						<Col span={cfg.span || 24} key={cfg.prop || index}>
 							<Form.Item name={cfg.prop} label={cfg.label} rules={rules} initialValue={cfg.value}>
-								<FieldRenderer cfg={component} options={opts} />
+								<FieldRenderer cfg={component} options={opts} slots={slots} />
 							</Form.Item>
 						</Col>
 					);

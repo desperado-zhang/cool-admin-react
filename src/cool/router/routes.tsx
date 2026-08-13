@@ -15,6 +15,21 @@ import { resolveViewElement } from "./view-loader";
 export function buildRoutes(): RouteObject[] {
 	const { routes: menuRoutes, group } = useMenuStore.getState();
 	const homePath = useMenuStore.getState().getPath(group) || "/";
+	const homeMenu = (group.flatMap((e) => [e, ...(e.children || [])]) as { path: string; viewPath?: string | null; meta?: { isHome?: boolean } }[]).find(
+		(e) => e.meta?.isHome
+	);
+
+	// 首页：path 为 '/' 时直接在 index 渲染（否则 Navigate 自循环）
+	const indexRoute: RouteObject =
+		homePath === "/"
+			? {
+					index: true,
+					element: resolveViewElement(homeMenu?.viewPath)
+				}
+			: {
+					index: true,
+					element: <Navigate to={homePath} replace />
+				};
 
 	return [
 		{
@@ -25,10 +40,7 @@ export function buildRoutes(): RouteObject[] {
 			path: "/",
 			element: <Layout />,
 			children: [
-				{
-					index: true,
-					element: <Navigate to={homePath} replace />
-				},
+				indexRoute,
 				{
 					path: "my/info",
 					handle: { label: "个人中心" },

@@ -1,0 +1,23 @@
+.sys-user {
+	display: flex;
+	height: 100%;
+	background: #fff;
+	border-radius: 6px;
+	overflow: hidden;
+
+	&__left {
+		width: 260px;
+		border-right: 1px solid #e4e7ed;
+		overflow: hidden;
+	}
+
+	&__right {
+		flex: 1;
+		overflow: auto;
+
+		.cl-crud {
+			height: auto;
+			min-height: 100%;
+		}
+	}
+}

@@ -8,9 +8,21 @@ import type { TreeNode, TreeLike } from "../types";
 
 /**
  * 扁平数组 → 树（按 parentId 组装，保持 orderNum 排序）
+ * 兼容树形输入：先拍平再重建（后端 department.list 契约返回树形）
  */
 export function deepTree<T extends TreeLike>(list: T[]): TreeNode<T>[] {
-	const nodes = [...list].sort((a, b) => (a.orderNum ?? 0) - (b.orderNum ?? 0)) as TreeNode<T>[];
+	// 拍平（兼容树形输入）
+	const flat: T[] = [];
+	const walk = (items: T[]) => {
+		for (const item of items) {
+			flat.push(item);
+			const children = (item as TreeNode<T>).children;
+			if (children?.length) walk(children as T[]);
+		}
+	};
+	walk(list);
+
+	const nodes = [...flat].sort((a, b) => (a.orderNum ?? 0) - (b.orderNum ?? 0)) as TreeNode<T>[];
 	const map = new Map<number, TreeNode<T>>();
 
 	for (const node of nodes) {

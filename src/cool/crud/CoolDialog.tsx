@@ -24,6 +24,8 @@ interface CoolDialogProps {
 	onOpen?: () => void;
 	/** 表单绑定前转换数据（对应 Vue onOpened） */
 	onOpened?: (data: Record<string, unknown>) => void;
+	/** 表单插槽（slot-xxx 组件渲染） */
+	slots?: Record<string, (ctx: { value?: unknown; onChange?: (v: unknown) => void }) => React.ReactNode>;
 	onInfo?: (
 		data: Record<string, unknown>,
 		ctx: {
@@ -34,7 +36,7 @@ interface CoolDialogProps {
 	) => void;
 }
 
-export default function CoolDialog({ dialog, items, options, info = true, onSubmit, onOpen, onOpened, onInfo }: CoolDialogProps) {
+export default function CoolDialog({ dialog, items, options, info = true, onSubmit, onOpen, onOpened, slots, onInfo }: CoolDialogProps) {
 	const crud = useCoolCrudContext();
 	const { message } = App.useApp();
 	const [form] = Form.useForm();
@@ -107,7 +109,7 @@ export default function CoolDialog({ dialog, items, options, info = true, onSubm
 			confirmLoading={loading}
 			destroyOnClose
 		>
-			<CoolForm form={form} items={items} mode={mode} options={options} />
+			<CoolForm form={form} items={items} mode={mode} options={options} slots={slots} />
 		</Modal>
 	);
 }
