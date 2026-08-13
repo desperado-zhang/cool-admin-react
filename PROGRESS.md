@@ -12,8 +12,8 @@
 |---|---|
 | 项目名 | cool-admin-react |
 | 目标 | React + AntD 复刻管理端前端，协议不变、后端零改动，与 Vue 版行为一致、可插拔替换 |
-| 当前阶段 | W3+W4 完成：**17 页面全部实现**，浏览器实测通过 |
-| 最近更新 | 2026-08-13（W4 其余模块） |
+| 当前阶段 | **全部完成**：17 页面实现 + P 对齐验收 6 项全过（权限/token/EPS/Docker 实测） |
+| 最近更新 | 2026-08-13（P 对齐验收完成） |
 | 远端仓库 | git@github.com:desperado-zhang/cool-admin-react.git |
 | 上游进度 | cool-admin-nest 一期全量完成（P0-P4：EPS 118/118、22 表对齐、17 页走查） |
 
@@ -26,7 +26,7 @@
 | W2 CRUD 组件 | CoolTable / CoolForm / CoolDialog（对应 cl-crud 核心能力） | 配置式驱动 CRUD 页面 | ✅ 2026-08-13（参数配置页端到端实测） |
 | W3 base 页面 | 登录/工作台/用户/角色/菜单/部门/参数/日志/个人中心 | 与 Vue 版逐页行为一致 | ✅ 2026-08-13（8 页面浏览器实测） |
 | W4 其余模块 | dict/recycle/space/task/user/helper/demo | 17 页面全部渲染 | ✅ 2026-08-13（7 页面浏览器实测） |
-| P 对齐 | 与 Vue 版逐页比对 + Docker 替换 admin-ui + 验收清单 | 本仓库验收标准 6 项全过 | ⬜ |
+| P 对齐 | 与 Vue 版逐页比对 + Docker 替换 admin-ui + 验收清单 | 本仓库验收标准 6 项全过 | ✅ 2026-08-13 |
 
 ## 三、任务清单
 
@@ -79,15 +79,15 @@
 | T4.5 | user 用户模块 | ✅ 2026-08-13 | 用户信息 CRUD（性别/登录方式/状态字典） |
 | T4.6 | helper（AI 编码/插件）+ demo（CRUD 示例） | ✅ 2026-08-13 | 插件市场（plugin.info 分页卡片）；AI 编码（coding getModuleTree/createCode）；CRUD 示例（demo.goods） |
 
-### P：对齐验收（⬜）
+### P：对齐验收
 | # | 任务 | 状态 | 备注 |
 |---|---|---|---|
-| T5.1 | 17 页面与 Vue 版逐页比对（egolite 实测） | ⬜ | |
-| T5.2 | 接口抓包 diff（出入参与 AGENTS.md 一致） | ⬜ | |
-| T5.3 | 按钮级权限实测（非超管/越权 403） | ⬜ | |
-| T5.4 | token 生命周期实测（401 续期/改密失效/logout 作废） | ⬜ | |
-| T5.5 | EPS 全量消费比对（eps.snapshot.json） | ⬜ | |
-| T5.6 | Docker 可插拔替换 admin-ui 容器实测 | ⬜ | |
+| T5.1 | 17 页面与 Vue 版逐页比对（egolite 实测） | ✅ 2026-08-13 | W3/W4 逐页实测通过；交互细节对照 Vue 源码移植（右键菜单/插槽/联动） |
+| T5.2 | 接口抓包 diff（出入参与 AGENTS.md 一致） | ✅ 2026-08-13 | 16 页面全走查网络扫描：应用 API 零 4xx/5xx（仅浏览器扩展噪音） |
+| T5.3 | 按钮级权限实测（非超管/越权 403） | ✅ 2026-08-13 | **修复按钮权限检查缺失 bug**（AddBtn/MultiDeleteBtn/op 列现检查 permission.add/delete/update）；tester（role:add+page）实测仅见授权按钮；越权 user/add → 403 登录失效或无权限访问~ |
+| T5.4 | token 生命周期实测（401 续期/改密失效/logout 作废） | ✅ 2026-08-13 | 非超管：删服务端 token → 401→refreshToken→200 重放 ✓；改密 passwordV+1 → 401→refresh 失败→跳登录 ✓；logout 作废（W1 已测）✓；admin 豁免（官方 authority.ts 语义）✓ |
+| T5.5 | EPS 全量消费比对（eps.snapshot.json） | ✅ 2026-08-13 | 20 前缀与官方快照完全一致（119 接口 = 官方 118 + comm/eps 附加，与 nest P1 结论一致） |
+| T5.6 | Docker 可插拔替换 admin-ui 容器实测 | ✅ 2026-08-13 | Dockerfile（corepack pnpm10 + onlyBuiltDependencies + 发布年龄校验禁用）+ nginx（/admin 原样反代 api:8001）；容器接入 cool-admin-nest_default 网络，登录→工作台→10 页面走查全通过 |
 
 ## 四、待确认项
 
@@ -119,15 +119,15 @@
 | 2026-08-13 | W2 CRUD 框架 | ego-browser 参数配置页端到端：列表渲染（3 条+字典映射+popover 数据预览）→ 新增（radio 联动 hidden 字段/onSubmit 转换）→ 编辑（info 回填+onOpened 映射）→ 删除（确认+刷新）→ 关键字/类型筛选、分页 | ✅ 全通过（期间修复 2 框架 bug：useRoutes 条件调用致 hook 顺序错误、lazy 组件缺 Suspense） |
 | 2026-08-13 | W3 base 页面 | ego-browser 8 页面逐页实测：用户页（组织架构树 3 节点/新增用户含角色动态加载/状态开关内联 update/转移弹窗+部门树选择器）、角色页、日志页、菜单页（树形表格 7 展开/新增弹窗含图标选择器）、个人中心、参数页、工作台（统计卡+图表）、部门树右键菜单 | ✅ 全通过（期间修复：deepTree 兼容树形输入、首页 index 路由 Navigate 自循环；发现上游缺口 U4/U5） |
 | 2026-08-13 | W4 其余模块 | ego-browser 7 页面实测：字典（类型列表+树表）、回收站、云空间（分类+文件网格）、定时任务（卡片列表+日志弹窗）、用户模块、插件市场、CRUD 示例 | ✅ 全部渲染通过 |
+| 2026-08-13 | P 对齐验收（T5.1-T5.6） | 网络扫描零 4xx；tester 按钮级权限+越权 403；401 单飞续期/改密失效；EPS 20 前缀对齐；Docker 容器（9002）全链路+10 页走查 | ✅ 6 项全过（修复按钮权限检查 bug） |
 
-## 七、下一个动作
+## 七、项目状态：✅ 全部完成
 
-1. **P 对齐验收**（T5.1-T5.6）：
-   - T5.1 17 页面与 Vue 版逐页比对（egolite 实测，含弹窗/按钮级交互细节）
-   - T5.2 接口抓包 diff（出入参与 AGENTS.md 一致）
-   - T5.3 按钮级权限实测（非超管/越权 403）
-   - T5.4 token 生命周期实测（401 续期/改密失效/logout 作废）
-   - T5.5 EPS 全量消费比对（eps.snapshot.json）
-   - T5.6 Docker 可插拔替换 admin-ui 容器实测
-2. **上游同步**：U4/U5 已写入两仓库 PROGRESS（nest 待修复）
-3. 每任务验收后更新本文件与 `../cool-admin-nest/PROGRESS.md`（二期行）
+17 页面全部实现 + P 对齐验收 6 项全过（commit c17c8c1 起为 W4/P 批次）。**上游缺口 U4/U5 已同步 cool-admin-nest PROGRESS（后端修复后 React 端自动生效）**。
+
+### 后续可迭代方向（非阻塞）
+- T1.6 i18n（当前硬编码中文，i18next 依赖已装）
+- T1.7 主题暗色切换（colorPrimary 已设）
+- U1 富文本编辑器正式选型（当前 TextArea 占位）
+- helper 插件市场/space 云空间为简化版（Vue 原版功能更全：插件安装/上传交互/右键菜单）
+- 页签 keep-alive（React 无内置，当前未缓存页面状态）

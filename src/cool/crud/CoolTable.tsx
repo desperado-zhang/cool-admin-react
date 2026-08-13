@@ -9,6 +9,7 @@ import { Button, Table } from "antd";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import type { TableProps } from "antd";
 import { useCoolCrudContext } from "./useCoolCrud";
+import { usePermission } from "../hooks/usePermission";
 import { getComponent } from "./registry";
 import { useDictStore } from "../store/dict";
 import type { ColumnConfig, DictOption, TableSlots } from "./types";
@@ -23,6 +24,7 @@ interface CoolTableProps {
 export default function CoolTable({ columns, slots, rowKey = "id", height }: CoolTableProps) {
 	const crud = useCoolCrudContext();
 	const dictStore = useDictStore();
+	const { has } = usePermission();
 
 	/** 字典选项解析 */
 	const resolveDict = (dict?: string | DictOption[]): DictOption[] => {
@@ -56,6 +58,7 @@ export default function CoolTable({ columns, slots, rowKey = "id", height }: Coo
 			// 操作列
 			if (item.type === "op") {
 				const buttons = item.buttons || ["edit", "delete"];
+				const perm = (crud.service as unknown as { permission?: Record<string, string> })?.permission;
 
 				result.push({
 					title: item.label || "操作",
@@ -66,6 +69,7 @@ export default function CoolTable({ columns, slots, rowKey = "id", height }: Coo
 						<>
 							{buttons.map((btn) => {
 								if (btn === "edit") {
+									if (!has(perm?.update)) return null;
 									return (
 										<Button
 											key={btn}
@@ -80,6 +84,7 @@ export default function CoolTable({ columns, slots, rowKey = "id", height }: Coo
 								}
 
 								if (btn === "delete") {
+									if (!has(perm?.delete)) return null;
 									return (
 										<Button
 											key={btn}

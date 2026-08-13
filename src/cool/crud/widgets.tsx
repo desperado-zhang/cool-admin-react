@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Button, Input, Pagination, Select, Space } from "antd";
 import { DeleteOutlined, PlusOutlined, ReloadOutlined, SearchOutlined } from "@ant-design/icons";
 import { useCoolCrudContext } from "./useCoolCrud";
+import { usePermission } from "../hooks/usePermission";
 
 /** 刷新按钮 */
 export function RefreshBtn({ label = "刷新" }: { label?: string }) {
@@ -14,9 +15,14 @@ export function RefreshBtn({ label = "刷新" }: { label?: string }) {
 	return <Button icon={<ReloadOutlined />} onClick={() => crud.refresh()}>{label}</Button>;
 }
 
-/** 新增按钮（权限：service.permission.add） */
+/** 新增按钮（权限：service.permission.add，对齐 Vue cl-add-btn） */
 export function AddBtn({ label = "新增" }: { label?: string }) {
 	const crud = useCoolCrudContext();
+	const { has } = usePermission();
+
+	if (!has((crud.service as unknown as { permission?: { add?: string } })?.permission?.add)) {
+		return null;
+	}
 
 	return (
 		<Button type="primary" icon={<PlusOutlined />} onClick={() => crud.rowAppend()}>
@@ -25,9 +31,14 @@ export function AddBtn({ label = "新增" }: { label?: string }) {
 	);
 }
 
-/** 批量删除按钮（权限：service.permission.delete） */
+/** 批量删除按钮（权限：service.permission.delete，对齐 Vue cl-multi-delete-btn） */
 export function MultiDeleteBtn({ label = "删除" }: { label?: string }) {
 	const crud = useCoolCrudContext();
+	const { has } = usePermission();
+
+	if (!has((crud.service as unknown as { permission?: { delete?: string } })?.permission?.delete)) {
+		return null;
+	}
 
 	return (
 		<Button
