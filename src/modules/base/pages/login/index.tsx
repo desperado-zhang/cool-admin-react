@@ -5,6 +5,7 @@
  */
 import { useRef, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { App, Button, Form, Input } from "antd";
 import { service } from "@/cool/service";
 import { useUserStore } from "@/cool/store/user";
@@ -23,6 +24,7 @@ interface LoginForm {
 export default function LoginPage() {
 	const navigate = useNavigate();
 	const { message, modal } = App.useApp();
+	const { t } = useTranslation();
 	const picRef = useRef<PicCaptchaRef>(null);
 	const [saving, setSaving] = useState(false);
 	const [captchaId, setCaptchaId] = useState("");
@@ -39,17 +41,17 @@ export default function LoginPage() {
 		const { username, password, verifyCode } = form.getFieldsValue();
 
 		if (!username) {
-			message.error("用户名不能为空");
+			message.error(t("login.usernameRequired"));
 			return;
 		}
 
 		if (!password) {
-			message.error("密码不能为空");
+			message.error(t("login.passwordRequired"));
 			return;
 		}
 
 		if (!verifyCode) {
-			message.error("图片验证码不能为空");
+			message.error(t("login.captchaRequired"));
 			return;
 		}
 
@@ -73,7 +75,7 @@ export default function LoginPage() {
 			picRef.current?.refresh();
 			form.setFieldValue("verifyCode", "");
 
-			modal.error({ title: "提示", content: (err as Error).message });
+			modal.error({ title: t("common.tip"), content: (err as Error).message });
 		} finally {
 			setSaving(false);
 		}
@@ -93,21 +95,21 @@ export default function LoginPage() {
 					<span>{useAppStore.getState().name}</span>
 				</div>
 
-				<p className="page-login__desc">快速开发后台权限管理系统</p>
+				<p className="page-login__desc">{t("login.title")}</p>
 
 				<Form form={form} layout="vertical" disabled={saving} className="page-login__form" initialValues={{ username: storage.get("username") || "" }}>
-					<Form.Item label="用户名" name="username">
-						<Input placeholder="请输入用户名" maxLength={20} size="large" />
+					<Form.Item label={t("login.username")} name="username">
+						<Input placeholder={t("login.usernamePlaceholder")} maxLength={20} size="large" />
 					</Form.Item>
 
-					<Form.Item label="密码" name="password">
-						<Input.Password placeholder="请输入密码" maxLength={20} size="large" autoComplete="new-password" />
+					<Form.Item label={t("login.password")} name="password">
+						<Input.Password placeholder={t("login.passwordPlaceholder")} maxLength={20} size="large" autoComplete="new-password" />
 					</Form.Item>
 
-					<Form.Item label="验证码" name="verifyCode">
+					<Form.Item label={t("login.captcha")} name="verifyCode">
 						<div className="page-login__captcha">
 							<Input
-								placeholder="验证码"
+								placeholder={t("login.captchaPlaceholder")}
 								maxLength={4}
 								size="large"
 								onPressEnter={toLogin}
@@ -118,7 +120,7 @@ export default function LoginPage() {
 
 					<div className="page-login__op">
 						<Button type="primary" size="large" block loading={saving} onClick={toLogin}>
-							登录
+							{t("login.login")}
 						</Button>
 					</div>
 				</Form>

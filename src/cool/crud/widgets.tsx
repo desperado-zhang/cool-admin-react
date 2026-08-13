@@ -3,22 +3,29 @@
  * RefreshBtn / AddBtn / MultiDeleteBtn / SearchKey / Flex1 / CoolPagination
  */
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Button, Input, Pagination, Select, Space } from "antd";
 import { DeleteOutlined, PlusOutlined, ReloadOutlined, SearchOutlined } from "@ant-design/icons";
 import { useCoolCrudContext } from "./useCoolCrud";
 import { usePermission } from "../hooks/usePermission";
 
 /** 刷新按钮 */
-export function RefreshBtn({ label = "刷新" }: { label?: string }) {
+export function RefreshBtn({ label }: { label?: string }) {
 	const crud = useCoolCrudContext();
+	const { t } = useTranslation();
 
-	return <Button icon={<ReloadOutlined />} onClick={() => crud.refresh()}>{label}</Button>;
+	return (
+		<Button icon={<ReloadOutlined />} onClick={() => crud.refresh()}>
+			{label ?? t("common.refresh")}
+		</Button>
+	);
 }
 
 /** 新增按钮（权限：service.permission.add，对齐 Vue cl-add-btn） */
-export function AddBtn({ label = "新增" }: { label?: string }) {
+export function AddBtn({ label }: { label?: string }) {
 	const crud = useCoolCrudContext();
 	const { has } = usePermission();
+	const { t } = useTranslation();
 
 	if (!has((crud.service as unknown as { permission?: { add?: string } })?.permission?.add)) {
 		return null;
@@ -26,15 +33,16 @@ export function AddBtn({ label = "新增" }: { label?: string }) {
 
 	return (
 		<Button type="primary" icon={<PlusOutlined />} onClick={() => crud.rowAppend()}>
-			{label}
+			{label ?? t("common.add")}
 		</Button>
 	);
 }
 
 /** 批量删除按钮（权限：service.permission.delete，对齐 Vue cl-multi-delete-btn） */
-export function MultiDeleteBtn({ label = "删除" }: { label?: string }) {
+export function MultiDeleteBtn({ label }: { label?: string }) {
 	const crud = useCoolCrudContext();
 	const { has } = usePermission();
+	const { t } = useTranslation();
 
 	if (!has((crud.service as unknown as { permission?: { delete?: string } })?.permission?.delete)) {
 		return null;
@@ -47,20 +55,21 @@ export function MultiDeleteBtn({ label = "删除" }: { label?: string }) {
 			disabled={!crud.selection.length}
 			onClick={() => crud.rowDelete(crud.selection.map((e) => e.id as number))}
 		>
-			{label}
+			{label ?? t("common.delete")}
 		</Button>
 	);
 }
 
 /** 关键字搜索（对应 cl-search-key） */
 export function SearchKey({
-	placeholder = "搜索关键字",
+	placeholder,
 	delay = 300
 }: {
 	placeholder?: string;
 	delay?: number;
 }) {
 	const crud = useCoolCrudContext();
+	const { t } = useTranslation();
 	const [value, setValue] = useState("");
 
 	const onChange = (v: string) => {
@@ -76,7 +85,7 @@ export function SearchKey({
 			allowClear
 			style={{ width: 220 }}
 			prefix={<SearchOutlined />}
-			placeholder={placeholder}
+			placeholder={placeholder ?? t("common.searchPlaceholder")}
 			value={value}
 			onChange={(e) => onChange(e.target.value)}
 			onPressEnter={() => crud.refresh({ keyword: value || undefined })}
@@ -102,12 +111,13 @@ export function SearchSelect({
 	width?: number;
 }) {
 	const crud = useCoolCrudContext();
+	const { t } = useTranslation();
 
 	return (
 		<Select
 			allowClear
 			style={{ width }}
-			placeholder={placeholder}
+			placeholder={placeholder ?? t("common.searchPlaceholder")}
 			options={options}
 			value={(crud.params[prop] as never) ?? undefined}
 			onChange={(v) => crud.refresh({ [prop]: v })}

@@ -4,6 +4,7 @@
  * - 支持关键字过滤 / 折叠
  */
 import { createElement, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Input, Menu } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
@@ -21,6 +22,7 @@ export default function Slider() {
 	const group = useMenuStore((s) => s.group);
 	const homePath = useMenuStore((s) => s.getPath(s.group));
 	const [keyWord, setKeyWord] = useState("");
+	const { t } = useTranslation();
 
 	// 选中项：首页映射到 '/'（与 Vue bmenu 一致）
 	const selectedKeys = useMemo(() => {
@@ -89,7 +91,7 @@ export default function Slider() {
 			<div className="app-slider__search">
 				<Input
 					value={keyWord}
-					placeholder="搜索关键字"
+					placeholder={t("layout.menuSearch")}
 					allowClear
 					prefix={<SearchOutlined style={{ color: "#e5eaf3" }} />}
 					onChange={(e) => setKeyWord(e.target.value)}

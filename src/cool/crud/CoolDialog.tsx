@@ -5,6 +5,7 @@
  * - submit 成功 → 关闭 + 刷新列表
  */
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { App, Form, Modal } from "antd";
 import { useCoolCrudContext } from "./useCoolCrud";
 import CoolForm from "./CoolForm";
@@ -39,6 +40,7 @@ interface CoolDialogProps {
 export default function CoolDialog({ dialog, items, options, info = true, onSubmit, onOpen, onOpened, slots, onInfo }: CoolDialogProps) {
 	const crud = useCoolCrudContext();
 	const { message } = App.useApp();
+	const { t } = useTranslation();
 	const [form] = Form.useForm();
 	const [loading, setLoading] = useState(false);
 
@@ -102,7 +104,7 @@ export default function CoolDialog({ dialog, items, options, info = true, onSubm
 	return (
 		<Modal
 			open={open}
-			title={dialog?.title || (mode === "add" ? "新增" : "编辑")}
+			title={dialog?.title || (mode === "add" ? t("crud.addDialog") : t("crud.editDialog"))}
 			width={dialog?.width || 600}
 			onOk={onOk}
 			onCancel={crud.close}

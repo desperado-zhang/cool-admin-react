@@ -3,6 +3,7 @@
  * - 挂载即刷新；点击刷新；支持 svg / base64 两种返回
  */
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { App, Spin } from "antd";
 import { service } from "@/cool/service";
 
@@ -17,6 +18,7 @@ interface PicCaptchaProps {
 
 const PicCaptcha = forwardRef<PicCaptchaRef, PicCaptchaProps>(({ onChange }, ref) => {
 	const { modal } = App.useApp();
+	const { t } = useTranslation();
 	const [svg, setSvg] = useState("");
 	const [base64, setBase64] = useState("");
 	const [loading, setLoading] = useState(true);
@@ -41,10 +43,10 @@ const PicCaptcha = forwardRef<PicCaptchaRef, PicCaptchaProps>(({ onChange }, ref
 				}
 				onChange(captchaId);
 			} else {
-				modal.error({ title: "提示", content: "验证码获取失败" });
+				modal.error({ title: t("common.tip"), content: t("login.captchaFailed") });
 			}
 		} catch (err) {
-			modal.error({ title: "提示", content: (err as Error).message });
+			modal.error({ title: t("common.tip"), content: (err as Error).message });
 		} finally {
 			setLoading(false);
 		}

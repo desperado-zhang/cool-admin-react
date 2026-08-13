@@ -5,6 +5,7 @@
  */
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { App } from "antd";
+import { useTranslation } from "react-i18next";
 import type { BaseService } from "../service/base";
 
 export interface CoolCrud {
@@ -55,6 +56,7 @@ export interface CoolCrudOptions {
 
 export function useCoolCrud(options: CoolCrudOptions): CoolCrud {
 	const { message, modal } = App.useApp();
+	const { t } = useTranslation();
 	const service = options.service;
 
 	const [loading, setLoading] = useState(false);
@@ -139,13 +141,13 @@ export function useCoolCrud(options: CoolCrudOptions): CoolCrud {
 		(ids: number[]) =>
 			new Promise<boolean>((resolve) => {
 				modal.confirm({
-					title: "提示",
-					content: "确定删除所选数据吗？",
+					title: t("common.tip"),
+					content: t("crud.deleteConfirm"),
 					okType: "danger",
 					onOk: async () => {
 						try {
 							await service.delete({ ids });
-							message.success("删除成功");
+							message.success(t("crud.deleteSuccess"));
 							await refresh();
 							resolve(true);
 						} catch (err) {
@@ -164,10 +166,10 @@ export function useCoolCrud(options: CoolCrudOptions): CoolCrud {
 			try {
 				if (upsert.mode === "add") {
 					await service.add(data);
-					message.success("添加成功");
+					message.success(t("crud.addSuccess"));
 				} else {
 					await service.update(data);
-					message.success("更新成功");
+					message.success(t("crud.updateSuccess"));
 				}
 				setUpsert((u) => ({ ...u, open: false }));
 				await refresh();

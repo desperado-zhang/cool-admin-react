@@ -19,6 +19,8 @@ export interface ProcessItem {
 
 interface ProcessState {
 	list: ProcessItem[];
+	/** keep-alive 缓存 key 列表（react-activation） */
+	cacheKeys: string[];
 
 	add: (data: ProcessItem) => void;
 	close: () => void;
@@ -27,8 +29,14 @@ interface ProcessState {
 	setTitle: (title: string) => void;
 }
 
+/** 路径 → keep-alive key（对齐 Vue caches 命名） */
+export function pathKey(path: string) {
+	return path.substring(1).replace(/\//g, "-") || "home";
+}
+
 export const useProcessStore = create<ProcessState>()((set) => ({
 	list: [],
+	cacheKeys: [],
 
 	add(data) {
 		set((state) => {
@@ -46,7 +54,14 @@ export const useProcessStore = create<ProcessState>()((set) => ({
 				list[index] = { ...data, active: true };
 			}
 
-			return { list };
+			// keep-alive：keepAlive 页签加入缓存列表
+			const cacheKeys = [...state.cacheKeys];
+			if (data.meta?.keepAlive) {
+				const key = pathKey(data.path);
+				if (!cacheKeys.includes(key)) cacheKeys.push(key);
+			}
+
+			return { list, cacheKeys };
 		});
 	},
 
@@ -54,21 +69,24 @@ export const useProcessStore = create<ProcessState>()((set) => ({
 		set((state) => {
 			const index = state.list.findIndex((e) => e.active);
 			const list = [...state.list];
-			if (index > -1) list.splice(index, 1);
-			return { list };
+			if (index > -1) {
+				const item = list.splice(index, 1)[0];
+				return { list, cacheKeys: state.cacheKeys.filter((k) => k !== pathKey(item.path)) };
+			}
+			return {};
 		});
 	},
 
 	remove(index) {
 		set((state) => {
 			const list = [...state.list];
-			list.splice(index, 1);
-			return { list };
+			const item = list.splice(index, 1)[0];
+			return item ? { list, cacheKeys: state.cacheKeys.filter((k) => k !== pathKey(item.path)) } : { list };
 		});
 	},
 
 	clear() {
-		set({ list: [] });
+		set({ list: [], cacheKeys: [] });
 	},
 
 	setTitle(title) {

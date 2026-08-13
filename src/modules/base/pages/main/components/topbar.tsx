@@ -1,23 +1,30 @@
 /**
  * 顶栏（对应 Vue 版 main/components/topbar.vue）
- * - 折叠开关 + 面包屑 + 用户下拉（个人中心 / 退出登录）
+ * - 折叠开关 + 面包屑 + 语言切换 + 暗色主题 + 用户下拉（个人中心 / 退出登录）
  */
 import { useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { App, Avatar, Breadcrumb, Dropdown } from "antd";
-import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
+import { GlobalOutlined, MenuFoldOutlined, MenuUnfoldOutlined, MoonOutlined, SunOutlined } from "@ant-design/icons";
 import { useAppStore } from "@/cool/store/app";
 import { useUserStore } from "@/cool/store/user";
 import { useMenuStore, type FormattedMenu } from "@/cool/store/menu";
+import { languages, useI18nStore, type Locale } from "@/locales";
 import { service } from "@/cool/service";
 
 export default function Topbar() {
 	const navigate = useNavigate();
 	const location = useLocation();
 	const { modal } = App.useApp();
+	const { t } = useTranslation();
 
 	const isFold = useAppStore((s) => s.isFold);
 	const fold = useAppStore((s) => s.fold);
+	const dark = useAppStore((s) => s.dark);
+	const setDark = useAppStore((s) => s.setDark);
+	const locale = useI18nStore((s) => s.locale);
+	const setLocale = useI18nStore((s) => s.setLocale);
 	const userInfo = useUserStore((s) => s.userInfo);
 	const group = useMenuStore((s) => s.group);
 
@@ -48,8 +55,8 @@ export default function Topbar() {
 	// 退出登录
 	const onExit = () => {
 		modal.confirm({
-			title: "提示",
-			content: "确定退出登录吗？",
+			title: t("common.tip"),
+			content: t("layout.logoutConfirm"),
 			okType: "danger",
 			onOk: async () => {
 				await service.base.comm.logout();
@@ -71,19 +78,40 @@ export default function Topbar() {
 
 			<div className="app-topbar__flex" />
 
+			{/* 语言切换（对齐 Vue config.i18n.languages） */}
+			<Dropdown
+				menu={{
+					items: languages.map((l) => ({
+						key: l.value,
+						label: l.label,
+						disabled: locale === l.value,
+						onClick: () => setLocale(l.value as Locale)
+					}))
+				}}
+			>
+				<div className="app-topbar__tool" title="Language">
+					<GlobalOutlined />
+				</div>
+			</Dropdown>
+
+			{/* 暗色主题 */}
+			<div className="app-topbar__tool" title="Theme" onClick={() => setDark()}>
+				{dark ? <SunOutlined /> : <MoonOutlined />}
+			</div>
+
 			{userInfo ? (
 				<Dropdown
 					menu={{
 						items: [
 							{
 								key: "my",
-								label: "个人中心",
+								label: t("layout.personalCenter"),
 								onClick: () => navigate("/my/info")
 							},
 							{
 								key: "exit",
 								danger: true,
-								label: "退出登录",
+								label: t("layout.logout"),
 								onClick: onExit
 							}
 						]

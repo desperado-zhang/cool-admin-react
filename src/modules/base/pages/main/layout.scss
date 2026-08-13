@@ -267,6 +267,24 @@
 		flex: 1;
 	}
 
+	&__tool {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		height: 30px;
+		width: 30px;
+		margin-right: 8px;
+		cursor: pointer;
+		border-radius: 6px;
+		font-size: 15px;
+		color: #606266;
+
+		&:hover {
+			background-color: #f5f7fa;
+			color: #1668dc;
+		}
+	}
+
 	&__user {
 		display: flex;
 		align-items: center;

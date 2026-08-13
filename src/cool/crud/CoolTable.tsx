@@ -5,6 +5,7 @@
  * - 服务端排序：sortable → refresh({ order, sort })
  */
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { Button, Table } from "antd";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import type { TableProps } from "antd";
@@ -25,6 +26,7 @@ export default function CoolTable({ columns, slots, rowKey = "id", height }: Coo
 	const crud = useCoolCrudContext();
 	const dictStore = useDictStore();
 	const { has } = usePermission();
+	const { t } = useTranslation();
 
 	/** 字典选项解析 */
 	const resolveDict = (dict?: string | DictOption[]): DictOption[] => {
@@ -61,7 +63,7 @@ export default function CoolTable({ columns, slots, rowKey = "id", height }: Coo
 				const perm = (crud.service as unknown as { permission?: Record<string, string> })?.permission;
 
 				result.push({
-					title: item.label || "操作",
+					title: item.label || t("common.operation"),
 					width: item.width || 180,
 					align: "center",
 					fixed: "right",
@@ -78,7 +80,7 @@ export default function CoolTable({ columns, slots, rowKey = "id", height }: Coo
 											icon={<EditOutlined />}
 											onClick={() => crud.rowEdit(row)}
 										>
-											编辑
+											{t("common.edit")}
 										</Button>
 									);
 								}
@@ -94,7 +96,7 @@ export default function CoolTable({ columns, slots, rowKey = "id", height }: Coo
 											icon={<DeleteOutlined />}
 											onClick={() => crud.rowDelete([row.id as number])}
 										>
-											删除
+											{t("common.delete")}
 										</Button>
 									);
 								}

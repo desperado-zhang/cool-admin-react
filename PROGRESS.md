@@ -12,8 +12,8 @@
 |---|---|
 | 项目名 | cool-admin-react |
 | 目标 | React + AntD 复刻管理端前端，协议不变、后端零改动，与 Vue 版行为一致、可插拔替换 |
-| 当前阶段 | **全部完成**：17 页面实现 + P 对齐验收 6 项全过（权限/token/EPS/Docker 实测） |
-| 最近更新 | 2026-08-13（P 对齐验收完成） |
+| 当前阶段 | **全部完成**：17 页面 + P 验收 6 项全过 + 收尾项全补齐（i18n/暗色/富文本/keep-alive/抓包比对/compose 替换） |
+| 最近更新 | 2026-08-13（收尾项补齐） |
 | 远端仓库 | git@github.com:desperado-zhang/cool-admin-react.git |
 | 上游进度 | cool-admin-nest 一期全量完成（P0-P4：EPS 118/118、22 表对齐、17 页走查） |
 
@@ -22,7 +22,7 @@
 | 里程碑 | 内容 | 验收标准 | 状态 |
 |---|---|---|---|
 | W0 准备 | 仓库骨架、文档、构建工具链、契约层骨架 | 可构建、可推送 | ✅ 2026-08-13 |
-| W1 框架 | 登录链路 + 主布局 + 动态路由（menus→routes）+ 权限组件 + EPS service 层 | 登录后菜单/路由/按钮权限正常 | 🚧 T1.1-T1.5 ✅；T1.6 i18n/T1.7 主题 ⬜ |
+| W1 框架 | 登录链路 + 主布局 + 动态路由（menus→routes）+ 权限组件 + EPS service 层 | 登录后菜单/路由/按钮权限正常 | ✅ 2026-08-13（T1.1-T1.7 全部完成） |
 | W2 CRUD 组件 | CoolTable / CoolForm / CoolDialog（对应 cl-crud 核心能力） | 配置式驱动 CRUD 页面 | ✅ 2026-08-13（参数配置页端到端实测） |
 | W3 base 页面 | 登录/工作台/用户/角色/菜单/部门/参数/日志/个人中心 | 与 Vue 版逐页行为一致 | ✅ 2026-08-13（8 页面浏览器实测） |
 | W4 其余模块 | dict/recycle/space/task/user/helper/demo | 17 页面全部渲染 | ✅ 2026-08-13（7 页面浏览器实测） |
@@ -47,8 +47,8 @@
 | T1.3 | 动态路由：登录 → permmenu → deepTree 菜单 → filter(type==1) 路由注册 | 4.1 | ✅ 2026-08-13 | **修复 bug**：首页路径误从扁平列表取（应组树），致 用户列表 被误标 isHome；组树后正确。扁平数组契约 ✓ |
 | T1.4 | 路由守卫（无 token 跳登录 / 404 / 工作台重定向） | — | ✅ 2026-08-13 | Layout 守卫 + 登录页已登录回跳 + 401/403/404/500/502 页面 |
 | T1.5 | EPS vite 插件：构建期注入 EPS → 生成 service 层 | 8.x | ✅ 2026-08-13 | U3 决策：**虚拟模块 + 提交生成 d.ts**（见 ADR D4）。`virtual:eps` 构建期注入；`service.base.sys.user.page()` 全量可用（20 实体/119 接口）；权限码 map（base:sys:user:add 等）；`pnpm eps` 重新生成；后端加接口 → pnpm eps + 重建 bundle |
-| T1.6 | i18n（zh-CN/en-US，AntD locale 联动） | — | ⬜ | 当前硬编码中文；AntD zhCN 已接 |
-| T1.7 | 主题（暗色切换/主色） | — | ⬜ | colorPrimary #1668dc 已设；暗色切换未做 |
+| T1.6 | i18n（zh-CN/en-US，AntD locale 联动） | — | ✅ 2026-08-13 | i18next + react-i18next；顶栏语言下拉（中文/English）；框架层文案双语（登录/布局/CRUD 按钮/消息）；语言持久化 localStorage locale；AntD locale 联动；DB 菜单名与页面列标签按后端数据（中文）显示 |
+| T1.7 | 主题（暗色切换/主色） | — | ✅ 2026-08-13 | 顶栏月亮/太阳切换；AntD darkAlgorithm + html.dark；colorPrimary #1668dc |
 
 ### W2：CRUD 组件
 | # | 任务 | 状态 | 备注 |
@@ -93,7 +93,7 @@
 
 | # | 待确认项 | 状态 | 备注 |
 |---|---|---|---|
-| U1 | React 版富文本编辑器选型（对应 wangeditor） | ⬜ | 参数配置页 html 编辑需要（暂 TextArea 占位） |
+| U1 | React 版富文本编辑器选型（对应 wangeditor） | ✅ 2026-08-13 | **wangEditor 已接入**（@wangeditor/editor-for-react），cl-editor/cl-editor-wang 注册表组件；参数配置富文本类型实测渲染 |
 | U2 | 图标体系：官方菜单 icon 字符串（如 icon-setting）→ AntD 图标映射 | 🚧 | `src/cool/components/icon.tsx` 已建映射表（19 项，覆盖种子菜单全部 icon）；后续新菜单 icon 需补充 |
 | U3 | EPS vite 插件实现方式（虚拟模块 vs 代码生成） | ✅ 2026-08-13 | **虚拟模块（构建期注入）+ 提交生成 d.ts**（ADR D4）；缓存兜底链：远程 → node_modules/.cache → build/cool/eps.json（种子，已提交） |
 | U4 | **上游缺口**：nest 后端 user/page 未返回 roleName、未排除 admin、不支持 departmentIds 过滤（官方 midway 有：LEFT JOIN 角色名、`a.username != 'admin'`、`a.departmentId in (?)`） | 🚧 待 nest 修复 | React 侧已实现 departmentIds 过滤请求（后端忽略）；roleName 列已渲染（后端修复即生效）；待列入 nest PROGRESS 二期行 |
@@ -107,6 +107,7 @@
 | D2 | 复刻策略 | 结构镜像 Vue 版（src/cool 核心 + src/modules 页面一一对应），行为逐页比对 | 2026-08-13 |
 | D3 | 契约层先行 | 请求层/状态/树工具按契约实现后再做页面（对应 W0） | 2026-08-13 |
 | D4 | EPS 注入方案 | vite 虚拟模块（virtual:eps 构建期注入，对齐 Vue @cool-vue/vite-plugin）+ 生成 d.ts 提交仓库；缓存兜底链：远程 → node_modules/.cache → build/cool/eps.json 种子；`pnpm eps` 独立再生成；后端加接口须 pnpm eps + 重建 bundle（对齐 nest D10） | 2026-08-13 |
+| D5 | keep-alive | react-activation（AliveScope 置于 Router 内；KeepAlive 按路径 key/name，keepAlive 页签入 cacheList，关页签即 drop；实测 SPA 内切换状态保留） | 2026-08-13 |
 
 ## 六、验收记录
 
@@ -120,14 +121,13 @@
 | 2026-08-13 | W3 base 页面 | ego-browser 8 页面逐页实测：用户页（组织架构树 3 节点/新增用户含角色动态加载/状态开关内联 update/转移弹窗+部门树选择器）、角色页、日志页、菜单页（树形表格 7 展开/新增弹窗含图标选择器）、个人中心、参数页、工作台（统计卡+图表）、部门树右键菜单 | ✅ 全通过（期间修复：deepTree 兼容树形输入、首页 index 路由 Navigate 自循环；发现上游缺口 U4/U5） |
 | 2026-08-13 | W4 其余模块 | ego-browser 7 页面实测：字典（类型列表+树表）、回收站、云空间（分类+文件网格）、定时任务（卡片列表+日志弹窗）、用户模块、插件市场、CRUD 示例 | ✅ 全部渲染通过 |
 | 2026-08-13 | P 对齐验收（T5.1-T5.6） | 网络扫描零 4xx；tester 按钮级权限+越权 403；401 单飞续期/改密失效；EPS 20 前缀对齐；Docker 容器（9002）全链路+10 页走查 | ✅ 6 项全过（修复按钮权限检查 bug） |
+| 2026-08-13 | 收尾项补齐 | ① i18n：语言切换 English/中文实测生效（Refresh/Add/Delete/Edit 全双语）② 暗色主题切换 ✓ ③ wangEditor 富文本弹窗渲染 ✓ ④ keep-alive：SPA 内菜单/页签切换后搜索关键字+过滤状态保留 ✓ ⑤ 抓包比对：契约接口 68 个实测覆盖 56（82%），补测 12 个后 **100% 覆盖**（log/clear、task/update 经 UI 实测，其余 HTTP 契约验证）⑥ compose 字面替换：override 文件重建 ui 容器（build context=cool-admin-react），登录+工作台+4 关键页全过，已恢复 Vue 容器 | ✅ 全部完成 |
 
 ## 七、项目状态：✅ 全部完成
 
-17 页面全部实现 + P 对齐验收 6 项全过（commit c17c8c1 起为 W4/P 批次）。**上游缺口 U4/U5 已同步 cool-admin-nest PROGRESS（后端修复后 React 端自动生效）**。
+17 页面全部实现 + P 对齐验收 6 项全过 + 收尾项全补齐（i18n/暗色主题/wangEditor 富文本/keep-alive/接口抓包 100% 覆盖/compose 字面替换实测）。**上游缺口 U4/U5 已同步 cool-admin-nest PROGRESS（后端修复后 React 端自动生效）**。
 
 ### 后续可迭代方向（非阻塞）
-- T1.6 i18n（当前硬编码中文，i18next 依赖已装）
-- T1.7 主题暗色切换（colorPrimary 已设）
-- U1 富文本编辑器正式选型（当前 TextArea 占位）
-- helper 插件市场/space 云空间为简化版（Vue 原版功能更全：插件安装/上传交互/右键菜单）
-- 页签 keep-alive（React 无内置，当前未缓存页面状态）
+- helper 插件市场为简化版（Vue 原版含插件安装/启停交互）；space 云空间为简化版（无右键菜单/拖拽上传，种子数据无分类）
+- i18n 仅框架层双语；页面列标签按后端数据（中文）显示，如需页面级翻译可继续铺开
+- keep-alive 缓存上限与内存策略未调优（按页签生命周期清理）

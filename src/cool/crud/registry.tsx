@@ -5,7 +5,7 @@
  */
 import { Avatar, Checkbox, DatePicker, Image, Input, InputNumber, Popover, Radio, Select, Switch, TreeSelect, Upload } from "antd";
 import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import type { DictOption } from "./types";
 
 export interface ComponentRenderContext {
@@ -228,9 +228,37 @@ registerComponent("cl-upload", ({ value, onChange, props }) => {
 	);
 });
 
-// 富文本编辑器（U1：正式选型待定，暂以 TextArea 占位）
-registerComponent("cl-editor", ({ value, onChange }) => {
-	return <Input.TextArea rows={12} value={value as string} onChange={(e) => onChange?.(e.target.value)} />;
-});
+// 富文本编辑器（U1 已定：wangEditor，对齐 Vue 版 cl-editor-wang）
+import "@wangeditor/editor/dist/css/style.css";
+import { Editor, Toolbar } from "@wangeditor/editor-for-react";
+import type { IDomEditor } from "@wangeditor/editor";
 
+function WangEditor({ value, onChange }: { value?: unknown; onChange?: (value: unknown) => void }) {
+	const [editor, setEditor] = useState<IDomEditor | null>(null);
+
+	useEffect(() => {
+		return () => {
+			if (editor) {
+				editor.destroy();
+			}
+		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
+
+	return (
+		<div style={{ border: "1px solid #d9d9d9", borderRadius: 6, zIndex: 100 }}>
+			<Toolbar editor={editor} defaultConfig={{}} mode="default" style={{ borderBottom: "1px solid #d9d9d9" }} />
+			<Editor
+				defaultConfig={{}}
+				value={(value as string) || ""}
+				mode="default"
+				style={{ height: 260, overflowY: "hidden" }}
+				onCreated={setEditor}
+				onChange={(e) => onChange?.(e.getHtml())}
+			/>
+		</div>
+	);
+}
+
+registerComponent("cl-editor", ({ value, onChange }) => <WangEditor value={value} onChange={onChange} />);
 registerComponent("cl-editor-wang", getComponent("cl-editor")!);

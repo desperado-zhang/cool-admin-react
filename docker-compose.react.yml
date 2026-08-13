@@ -1,0 +1,10 @@
+# cool-admin-react 可插拔替换配置（配合 cool-admin-nest/docker-compose.yml 使用）
+# 用法（在 cool-admin-nest 目录）：
+#   docker compose -f docker-compose.yml -f ../cool-admin-react/docker-compose.react.yml up -d --build ui
+# 恢复 Vue 版：docker compose -f docker-compose.yml up -d --build ui
+services:
+  ui:
+    build: ../cool-admin-react
+    container_name: cool-admin-nest-ui
+    ports:
+      - "9000:80"

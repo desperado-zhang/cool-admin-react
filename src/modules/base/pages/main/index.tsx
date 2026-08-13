@@ -5,6 +5,7 @@
  */
 import { useEffect } from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { KeepAlive } from "react-activation";
 import { useUserStore } from "@/cool/store/user";
 import { useAppStore } from "@/cool/store/app";
 import { useMenuStore } from "@/cool/store/menu";
@@ -32,6 +33,9 @@ function AppLayout() {
 	const isFull = useAppStore((s) => s.isFull);
 	const group = useMenuStore((s) => s.group);
 
+	// 路径 key（对齐 Vue keep-alive caches 命名：path 去 / 后 / → -）
+	const pathKey = location.pathname.substring(1).replace(/\//g, "-") || "home";
+
 	// 路由变化 → 添加页签（对齐 Vue 守卫 process.add）
 	useEffect(() => {
 		const path = location.pathname;
@@ -48,6 +52,9 @@ function AppLayout() {
 		});
 	}, [location.pathname, group]);
 
+	// keep-alive 缓存列表（仅 keepAlive 页签；关闭页签时 drop）
+	const cacheKeys = useProcessStore((s) => s.cacheKeys);
+
 	return (
 		<div className={`app-layout ${isFold ? "is-collapse" : ""} ${isFull ? "is-full" : ""}`}>
 			<div className="app-layout__mask" onClick={() => useAppStore.getState().fold(true)} />
@@ -59,9 +66,11 @@ function AppLayout() {
 			<div className="app-layout__right">
 				<Topbar />
 				<Process />
-				<div className="app-layout__views">
-					<Outlet />
-				</div>
+				<KeepAlive key={pathKey} name={pathKey} cacheList={cacheKeys}>
+					<div className="app-layout__views">
+						<Outlet />
+					</div>
+				</KeepAlive>
 			</div>
 		</div>
 	);
