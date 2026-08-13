@@ -46,6 +46,35 @@ export interface TokenResult {
 	refreshExpire: number;
 }
 
+/** 用户信息（5.1 base_sys_user，password 已脱敏） */
+export interface UserInfo {
+	id: number;
+	createTime?: string;
+	updateTime?: string;
+	departmentId?: number | null;
+	departmentName?: string;
+	username: string;
+	password?: string;
+	passwordV?: number;
+	name?: string;
+	nickName?: string;
+	headImg?: string;
+	phone?: string;
+	email?: string;
+	remark?: string;
+	status?: number;
+	roleIdList?: number[];
+	[key: string]: unknown;
+}
+
+/** 登录入参（3.1） */
+export interface LoginDTO {
+	username: string;
+	password: string;
+	captchaId: string;
+	verifyCode: string;
+}
+
 /** 验证码返回（3.2） */
 export interface CaptchaResult {
 	captchaId: string;
@@ -74,12 +103,11 @@ export interface PermMenuResult {
 }
 
 /** 树形结构的通用字段（菜单/部门/字典等） */
-export interface TreeLike {
+export type TreeLike = {
 	id: number;
 	parentId: number | null;
 	orderNum?: number;
-	[key: string]: unknown;
-}
+};
 
 /** 树节点（deepTree 组树后） */
 export type TreeNode<T extends TreeLike> = T & { children?: TreeNode<T>[] };

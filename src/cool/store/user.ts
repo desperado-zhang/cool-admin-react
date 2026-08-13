@@ -1,70 +1,69 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import { config } from "@/config";
-import type { MenuItem } from "../types";
-
 /**
- * 用户状态（token / 权限 / 菜单）
- * 契约来源：cool-admin-nest AGENTS.md 4.1
- * - menus：permmenu 返回的扁平数组（组树在组件层做）
- * - perms：扁平权限码数组（按钮级显隐依据）
+ * 用户状态（token / 用户信息）
+ * 契约来源：cool-admin-nest AGENTS.md 3.1/4
+ * 行为对齐 Vue 版 base/store/user.ts：
+ * - setToken 按 expire 秒数写入 localStorage（token / refreshToken 分离）
+ * - logout 清除缓存并跳登录页
  */
+import { create } from "zustand";
+import { storage } from "../utils/storage";
+import { service } from "../service/api";
+import type { TokenResult, UserInfo } from "../types";
+import { useMenuStore } from "./menu";
+import { useProcessStore } from "./process";
+
 interface UserState {
 	token: string;
-	refreshToken: string;
-	userInfo: Record<string, unknown> | null;
-	menus: MenuItem[];
-	perms: string[];
+	userInfo: UserInfo | null;
 
-	setToken: (token: string, refreshToken?: string) => void;
-	setPermMenu: (perms: string[], menus: MenuItem[]) => void;
-	setUserInfo: (info: Record<string, unknown>) => void;
-	logout: () => void;
+	setToken: (data: TokenResult) => void;
+	set: (info: UserInfo) => void;
+	clear: () => void;
+	logout: () => Promise<void>;
+	get: () => Promise<UserInfo>;
 }
 
-export const useUserStore = create<UserState>()(
-	persist(
-		(set) => ({
-			token: "",
-			refreshToken: "",
-			userInfo: null,
-			menus: [],
-			perms: [],
+/** 初始 token（过期则不生效，与 Vue 版 storage 语义一致） */
+const initToken = storage.isExpired("token") ? "" : (storage.get<string>("token") || "");
+const initUserInfo = storage.get<UserInfo>("userInfo") || null;
 
-			setToken: (token, refreshToken) =>
-				set((s) => ({
-					token,
-					refreshToken: refreshToken ?? s.refreshToken
-				})),
+export const useUserStore = create<UserState>()((set, get) => ({
+	token: initToken,
+	userInfo: initUserInfo,
 
-			setPermMenu: (perms, menus) => set({ perms, menus }),
+	setToken(data) {
+		storage.set("token", data.token, data.expire);
+		storage.set("refreshToken", data.refreshToken, data.refreshExpire);
+		set({ token: data.token });
+	},
 
-			setUserInfo: (userInfo) => set({ userInfo }),
+	set(info) {
+		storage.set("userInfo", info);
+		set({ userInfo: info });
+	},
 
-			logout: () => set({ token: "", refreshToken: "", userInfo: null, menus: [], perms: [] })
-		}),
-		{
-			name: config.tokenKey,
-			partialize: (s) => ({
-				token: s.token,
-				refreshToken: s.refreshToken
-			})
+	clear() {
+		storage.remove("userInfo");
+		storage.remove("token");
+		storage.remove("refreshToken");
+		set({ token: "", userInfo: null });
+		useMenuStore.getState().clear();
+		useProcessStore.getState().clear();
+	},
+
+	async logout() {
+		try {
+			await service.base.comm.logout();
+		} catch {
+			// 服务端已失效也不阻塞本地清理
 		}
-	)
-);
+		get().clear();
+		window.location.href = "/login";
+	},
 
-/**
- * 权限判断（对应 Vue 版 v-permission 指令）
- * - 超管（username === 'admin'）恒放行（契约：官方 authority.ts）
- */
-export function usePermission() {
-	const { perms, userInfo } = useUserStore();
-
-	const has = (perm: string) => {
-		if ((userInfo as { username?: string } | null)?.username === "admin") return true;
-		if (!perm) return true;
-		return perms.includes(perm);
-	};
-
-	return { has, perms };
-}
+	async get() {
+		const info = await service.base.comm.person();
+		get().set(info);
+		return info;
+	}
+}));

@@ -1,7 +1,21 @@
 import axios, { AxiosError, AxiosHeaders, type AxiosRequestConfig, type AxiosResponse } from "axios";
+import NProgress from "nprogress";
+import "nprogress/nprogress.css";
 import { config } from "@/config";
-import { CoolCode, type CoolResult } from "../types";
+import { CoolCode, type CoolResult, type TokenResult } from "../types";
 import { useUserStore } from "../store/user";
+import { storage } from "../utils/storage";
+
+NProgress.configure({ showSpinner: false });
+
+/** 不显示请求进度条的接口（对齐 Vue base/config ignore.NProgress） */
+const ignoreProgress = [
+	"/admin/base/open/eps",
+	"/admin/base/comm/person",
+	"/admin/base/comm/permmenu",
+	"/admin/base/comm/upload",
+	"/admin/base/comm/uploadMode"
+];
 
 /**
  * 业务异常（对应后端 BizException）
@@ -40,6 +54,12 @@ request.interceptors.request.use((c) => {
 	if (token) {
 		c.headers.Authorization = token;
 	}
+
+	// 进度条（对齐 Vue 版）
+	if (!ignoreProgress.some((p) => c.url?.includes(p))) {
+		NProgress.start();
+	}
+
 	return c;
 });
 
@@ -54,19 +74,21 @@ function toLogin() {
 }
 
 async function refresh(): Promise<string> {
-	const { refreshToken } = useUserStore.getState();
+	const refreshToken = storage.get<string>("refreshToken");
 	if (!refreshToken) throw new BizError("登录失效~", CoolCode.BizFail);
-	const res = await rawRequest.get<CoolResult<{ token: string; refreshToken: string }>>("/admin/base/open/refreshToken", {
+	const res = await rawRequest.get<CoolResult<TokenResult>>("/admin/base/open/refreshToken", {
 		params: { refreshToken }
 	});
 	const body = res.data;
 	if (body.code !== CoolCode.Success) throw new BizError(body.message, body.code);
-	useUserStore.getState().setToken(body.data.token, body.data.refreshToken);
+	useUserStore.getState().setToken(body.data);
 	return body.data.token;
 }
 
 request.interceptors.response.use(
 	(response: AxiosResponse) => {
+		NProgress.done();
+
 		// 统一响应包装：直接解开 data
 		const body = response.data as CoolResult;
 		if (body && typeof body === "object" && "code" in body) {
@@ -79,6 +101,7 @@ request.interceptors.response.use(
 		return body as never;
 	},
 	async (error: AxiosError) => {
+		NProgress.done();
 		const { response } = error;
 
 		// HTTP 401：token 失效 → 尝试续期重放（契约 3.3）

@@ -1,0 +1,169 @@
+.page-login {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100%;
+	width: 100%;
+	position: relative;
+	background-color: #fff;
+	color: #2c3142;
+
+	&__bg {
+		position: absolute;
+		left: 0;
+		top: 0;
+		height: 100%;
+		width: 90%;
+		pointer-events: none;
+		transform: rotate(180deg) scaleY(-1);
+
+		img {
+			height: 100%;
+			width: 100%;
+		}
+	}
+
+	&__copyright {
+		position: absolute;
+		bottom: 15px;
+		left: 0;
+		text-align: center;
+		width: 100%;
+		color: #909399;
+		font-size: 14px;
+		user-select: none;
+	}
+
+	&__box {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		height: 100%;
+		width: 50%;
+		position: absolute;
+		right: 0;
+		top: 0;
+		z-index: 9;
+	}
+
+	&__logo {
+		height: 50px;
+		margin-bottom: 20px;
+		display: flex;
+		align-items: center;
+		user-select: none;
+
+		&-icon {
+			border-radius: 8px;
+			padding: 5px;
+			margin-right: 10px;
+			background-color: #2c3142;
+
+			img {
+				height: 36px;
+				display: block;
+			}
+		}
+
+		span {
+			font-size: 38px;
+			font-weight: bold;
+			line-height: 1;
+			letter-spacing: 3px;
+		}
+	}
+
+	&__desc {
+		font-size: 15px;
+		letter-spacing: 1px;
+		margin-bottom: 50px;
+		user-select: none;
+		max-width: 80%;
+		text-align: center;
+		color: #909399;
+	}
+
+	&__form {
+		width: 300px;
+
+		.ant-form-item {
+			margin-bottom: 20px;
+
+			.ant-form-item-label label {
+				color: #909399;
+				padding-left: 5px;
+				user-select: none;
+			}
+		}
+
+		.ant-input-affix-wrapper,
+		.ant-input {
+			background-color: #f8f8f8;
+			border: 0;
+			box-shadow: none;
+			border-radius: 8px;
+			font-size: 15px;
+			height: 45px;
+
+			&:-webkit-autofill {
+				-webkit-box-shadow: 0 0 0 1000px #f8f8f8 inset;
+				box-shadow: 0 0 0 1000px #f8f8f8 inset;
+			}
+		}
+	}
+
+	&__captcha {
+		position: relative;
+
+		.ant-input {
+			padding-right: 140px;
+		}
+
+		.pic-captcha {
+			position: absolute;
+			right: 0;
+			top: 0;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			cursor: pointer;
+			height: 45px;
+			width: 150px;
+			user-select: none;
+
+			&__svg {
+				height: 100%;
+				position: relative;
+
+				svg {
+					height: 45px;
+					width: 150px;
+				}
+			}
+
+			&__base64 {
+				height: 100%;
+			}
+		}
+	}
+
+	&__op {
+		display: flex;
+		justify-content: center;
+		margin-top: 40px;
+
+		.ant-btn {
+			height: 45px;
+			font-size: 16px;
+			border-radius: 8px;
+			letter-spacing: 1px;
+		}
+	}
+}
+
+@media screen and (max-width: 1024px) {
+	.page-login__box {
+		width: 100%;
+	}
+}
