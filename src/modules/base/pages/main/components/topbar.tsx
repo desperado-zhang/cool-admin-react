@@ -78,6 +78,12 @@ export default function Topbar() {
 
 			<div className="app-topbar__flex" />
 
+			{/* AI 极速编码（对齐官方 demo 顶栏） */}
+			<div className="app-topbar__ai" onClick={() => navigate("/helper/ai-code")}>
+				<div className="app-topbar__ai-t1">AI极速编码</div>
+				<div className="app-topbar__ai-t2">Start</div>
+			</div>
+
 			{/* 语言切换（对齐 Vue config.i18n.languages） */}
 			<Dropdown
 				menu={{

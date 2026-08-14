@@ -1,47 +1,84 @@
 /**
- * 工作台（对应 Vue 版 demo/views/home/index.vue，P2 静态演示页）
- * 统计卡片 + echarts 图表（静态演示数据）
+ * 工作台（对应官方 demo 版 demo/views/home，P2 静态演示页对齐）
+ * - 4 统计卡（总用户数/浏览量/付款笔数/总销售额）
+ * - 销售金额/销售订单切换 + 趋势图
+ * - 热门商品排行 + 分类占比
  */
 import ReactECharts from "echarts-for-react";
-import { Card, Col, Row, Space, Statistic, Table, Tag } from "antd";
-import { EyeOutlined, PayCircleOutlined, TeamOutlined, RiseOutlined } from "@ant-design/icons";
+import { Card, Col, Row, Segmented, Space, Statistic, Table, Tag } from "antd";
+import { EyeOutlined, PayCircleOutlined, RiseOutlined, TeamOutlined } from "@ant-design/icons";
+import { useState } from "react";
 import "./index.scss";
 
-const countCards = [
-	{ label: "总用户数", value: 12846, icon: <TeamOutlined />, color: "#1668dc" },
-	{ label: "总浏览量", value: 158621, icon: <EyeOutlined />, color: "#52c41a" },
-	{ label: "支付订单", value: 8962, icon: <PayCircleOutlined />, color: "#fa8c16" },
-	{ label: "转化率", value: 68.5, suffix: "%", icon: <RiseOutlined />, color: "#eb2f96" }
+const cards = [
+	{
+		label: "总用户数",
+		value: 74921,
+		icon: <TeamOutlined />,
+		color: "#1668dc",
+		extra: (
+			<span>
+				日增用户数 <b>69</b>
+			</span>
+		)
+	},
+	{
+		label: "浏览量",
+		value: 158621,
+		icon: <EyeOutlined />,
+		color: "#52c41a",
+		extra: (
+			<span>
+				访客数 <b>142</b>
+			</span>
+		)
+	},
+	{
+		label: "付款笔数",
+		value: 5903,
+		suffix: "笔",
+		icon: <PayCircleOutlined />,
+		color: "#fa8c16",
+		extra: (
+			<span>
+				转化率 <b>60%</b>
+			</span>
+		)
+	},
+	{
+		label: "总销售额",
+		value: 9608706,
+		suffix: "元",
+		icon: <RiseOutlined />,
+		color: "#eb2f96",
+		extra: (
+			<Space size={12}>
+				<span>
+					周同比 <b style={{ color: "#52c41a" }}>+7%</b>
+				</span>
+				<span>
+					日同比 <b style={{ color: "#f5222d" }}>-4%</b>
+				</span>
+			</Space>
+		)
+	}
 ];
 
-const lineOption = {
-	title: { text: "访问趋势", left: 20, top: 10, textStyle: { fontSize: 15 } },
-	tooltip: { trigger: "axis" },
-	grid: { left: 60, right: 30, top: 60, bottom: 40 },
-	xAxis: {
-		type: "category",
-		data: ["周一", "周二", "周三", "周四", "周五", "周六", "周日"]
-	},
-	yAxis: { type: "value" },
-	series: [
-		{
-			name: "访问量",
-			type: "line",
-			smooth: true,
-			areaStyle: { opacity: 0.15 },
-			data: [820, 932, 901, 934, 1290, 1330, 1320]
-		},
-		{
-			name: "订单量",
-			type: "line",
-			smooth: true,
-			data: [120, 232, 301, 434, 390, 330, 320]
-		}
-	]
-};
+const months = ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"];
+
+const saleAmount = [320, 302, 341, 374, 390, 450, 420, 500, 460, 520, 580, 560];
+const saleOrders = [120, 132, 101, 134, 190, 230, 210, 182, 191, 234, 290, 330];
+
+const hotGoods = [
+	{ rank: 1, name: "智能手表 Pro", amount: 102400, orders: 3214, rise: "+12%", time: "2026-08-01" },
+	{ rank: 2, name: "无线降噪耳机", amount: 89600, orders: 2801, rise: "+8%", time: "2026-07-28" },
+	{ rank: 3, name: "机械键盘", amount: 71200, orders: 1832, rise: "+5%", time: "2026-07-25" },
+	{ rank: 4, name: "4K 显示器", amount: 66800, orders: 1268, rise: "-2%", time: "2026-07-20" },
+	{ rank: 5, name: "便携充电宝", amount: 54300, orders: 2145, rise: "+15%", time: "2026-07-18" }
+];
 
 const pieOption = {
-	title: { text: "商品分类占比", left: 20, top: 10, textStyle: { fontSize: 15 } },
+	title: { text: "分类占比", left: 20, top: 10, textStyle: { fontSize: 15 } },
 	tooltip: { trigger: "item" },
 	legend: { bottom: 0 },
 	series: [
@@ -61,31 +98,42 @@ const pieOption = {
 	]
 };
 
-const hotGoods = [
-	{ rank: 1, name: "智能手表 Pro", sales: 3214, price: 1999 },
-	{ rank: 2, name: "无线降噪耳机", sales: 2801, price: 899 },
-	{ rank: 3, name: "便携充电宝", sales: 2145, price: 129 },
-	{ rank: 4, name: "机械键盘", sales: 1832, price: 459 },
-	{ rank: 5, name: "4K 显示器", sales: 1268, price: 2299 }
-];
-
 export default function Home() {
+	const [mode, setMode] = useState<string | number>("销售金额");
+
+	const lineOption = {
+		tooltip: { trigger: "axis" },
+		grid: { left: 50, right: 20, top: 30, bottom: 30 },
+		xAxis: { type: "category", data: months },
+		yAxis: { type: "value" },
+		series: [
+			{
+				name: mode,
+				type: "line",
+				smooth: true,
+				areaStyle: { opacity: 0.15 },
+				data: mode === "销售金额" ? saleAmount : saleOrders
+			}
+		]
+	};
+
 	return (
 		<div className="demo-home">
 			<Row gutter={10}>
-				{countCards.map((c) => (
+				{cards.map((c) => (
 					<Col lg={6} md={12} xs={24} key={c.label}>
 						<Card className="demo-home__card" styles={{ body: { padding: 20 } }}>
 							<Statistic
 								title={
 									<Space>
+										<span style={{ color: c.color, fontSize: 24 }}>{c.icon}</span>
 										<span>{c.label}</span>
 									</Space>
 								}
 								value={c.value}
 								suffix={c.suffix}
-								prefix={<span style={{ color: c.color, fontSize: 26, marginRight: 8 }}>{c.icon}</span>}
 							/>
+							<div style={{ marginTop: 8, fontSize: 12, color: "#909399" }}>{c.extra}</div>
 						</Card>
 					</Col>
 				))}
@@ -93,7 +141,18 @@ export default function Home() {
 
 			<Row gutter={10}>
 				<Col span={24}>
-					<Card className="demo-home__card">
+					<Card
+						className="demo-home__card"
+						title={
+							<Segmented
+								options={["销售金额", "销售订单"]}
+								value={mode}
+								onChange={setMode}
+							/>
+						}
+						extra="2026年"
+						size="small"
+					>
 						<ReactECharts option={lineOption} style={{ height: 320 }} />
 					</Card>
 				</Col>
@@ -101,7 +160,14 @@ export default function Home() {
 
 			<Row gutter={10}>
 				<Col lg={14} xs={24}>
-					<Card className="demo-home__card" title="热销商品" size="small">
+					<Card
+						className="demo-home__card"
+						title="热门商品排行"
+						extra={
+							<Segmented options={["今日", "本周", "本月"]} defaultValue="今日" />
+						}
+						size="small"
+					>
 						<Table
 							size="small"
 							pagination={false}
@@ -117,13 +183,21 @@ export default function Home() {
 										return <Tag color={colors[v - 1] || "default"}>{v}</Tag>;
 									}
 								},
-								{ title: "商品", dataIndex: "name" },
-								{ title: "销量", dataIndex: "sales" },
+								{ title: "商品名称", dataIndex: "name" },
 								{
-									title: "价格",
-									dataIndex: "price",
-									render: (v: number) => `¥${v}`
-								}
+									title: "商品金额",
+									dataIndex: "amount",
+									render: (v: number) => `¥${v.toLocaleString()}`
+								},
+								{ title: "下单次数", dataIndex: "orders" },
+								{
+									title: "日涨幅",
+									dataIndex: "rise",
+									render: (v: string) => (
+										<span style={{ color: v.startsWith("+") ? "#f5222d" : "#52c41a" }}>{v}</span>
+									)
+								},
+								{ title: "上架时间", dataIndex: "time" }
 							]}
 						/>
 					</Card>
@@ -137,5 +211,3 @@ export default function Home() {
 		</div>
 	);
 }
-
-

@@ -98,6 +98,8 @@
 | U3 | EPS vite 插件实现方式（虚拟模块 vs 代码生成） | ✅ 2026-08-13 | **虚拟模块（构建期注入）+ 提交生成 d.ts**（ADR D4）；缓存兜底链：远程 → node_modules/.cache → build/cool/eps.json（种子，已提交） |
 | U4 | **上游缺口**：nest 后端 user/page 未返回 roleName、未排除 admin、不支持 departmentIds 过滤（官方 midway 有：LEFT JOIN 角色名、`a.username != 'admin'`、`a.departmentId in (?)`） | 🚧 待 nest 修复 | React 侧已实现 departmentIds 过滤请求（后端忽略）；roleName 列已渲染（后端修复即生效）；待列入 nest PROGRESS 二期行 |
 | U5 | **上游缺口**：nest 后端 menu/list 不提取 `prop` 参数（Vue 版发 `{prop, order}` 排序会 1003 core error） | 🚧 待 nest 修复 | React 侧按契约 1.1 命名发 `{order, sort}`（实测可用）；建议 nest list 同步提取 prop |
+| U6 | **上游种子差异**：官方 menu.json「部门列表」为 type=2 按钮（无独立菜单入口），nest 种子为 type=1 菜单（/sys/department）；官方 demo 侧边栏无部门列表项 | 🚧 待 nest 修复 | 前端行为以数据为准，无需改前端；建议 nest 种子对齐官方（部门列表改 type=2） |
+| U7 | **上游种子差异**：官方 menu.json「首页」isShow=false（侧边栏不显示首页入口），nest 种子 isShow=1（会显示） | 🚧 待 nest 修复 | 同上，建议 nest 种子对齐官方 |
 
 ## 五、决策记录（ADR）
 
@@ -121,6 +123,7 @@
 | 2026-08-13 | W3 base 页面 | ego-browser 8 页面逐页实测：用户页（组织架构树 3 节点/新增用户含角色动态加载/状态开关内联 update/转移弹窗+部门树选择器）、角色页、日志页、菜单页（树形表格 7 展开/新增弹窗含图标选择器）、个人中心、参数页、工作台（统计卡+图表）、部门树右键菜单 | ✅ 全通过（期间修复：deepTree 兼容树形输入、首页 index 路由 Navigate 自循环；发现上游缺口 U4/U5） |
 | 2026-08-13 | W4 其余模块 | ego-browser 7 页面实测：字典（类型列表+树表）、回收站、云空间（分类+文件网格）、定时任务（卡片列表+日志弹窗）、用户模块、插件市场、CRUD 示例 | ✅ 全部渲染通过 |
 | 2026-08-13 | P 对齐验收（T5.1-T5.6） | 网络扫描零 4xx；tester 按钮级权限+越权 403；401 单飞续期/改密失效；EPS 20 前缀对齐；Docker 容器（9002）全链路+10 页走查 | ✅ 6 项全过（修复按钮权限检查 bug） |
+| 2026-08-13 | 官方 demo 逐页比对（show.cool-admin.com） | ego-browser 双开实测：菜单结构（左侧全树+顶层顺序）一致；用户/角色/参数/日志/回收站/端用户/任务卡片/个人中心/字典/文件管理/插件 页面列与按钮一致；菜单弹窗三态（目录/菜单/权限字段显隐）对齐修复；修复差异：顶栏 AI极速编码按钮、工作台 4 卡+销售图表+热门商品排行列、菜单/字典列顺序、space 上传按钮精简、插件 segmented+文档弹窗 | ✅ 全部对齐（crud 示例页为简化版 goods CRUD，官方为组件演示页——记录降级） |
 | 2026-08-13 | 收尾项补齐 | ① i18n：语言切换 English/中文实测生效（Refresh/Add/Delete/Edit 全双语）② 暗色主题切换 ✓ ③ wangEditor 富文本弹窗渲染 ✓ ④ keep-alive：SPA 内菜单/页签切换后搜索关键字+过滤状态保留 ✓ ⑤ 抓包比对：契约接口 68 个实测覆盖 56（82%），补测 12 个后 **100% 覆盖**（log/clear、task/update 经 UI 实测，其余 HTTP 契约验证）⑥ compose 字面替换：override 文件重建 ui 容器（build context=cool-admin-react），登录+工作台+4 关键页全过，已恢复 Vue 容器 | ✅ 全部完成 |
 
 ## 七、项目状态：✅ 全部完成

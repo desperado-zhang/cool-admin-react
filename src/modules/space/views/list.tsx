@@ -4,7 +4,7 @@
  */
 import { useEffect, useState } from "react";
 import { App, Button, Empty, Image, Modal, Pagination, Popconfirm, Upload } from "antd";
-import { EyeOutlined, UploadOutlined } from "@ant-design/icons";
+import { EyeOutlined, ReloadOutlined, UploadOutlined } from "@ant-design/icons";
 import { service } from "@/cool/service";
 import "./list.scss";
 
@@ -92,8 +92,8 @@ export default function SpaceList() {
 
 			<div className="space-list__right">
 				<div className="space-list__toolbar">
-					<Button icon={<UploadOutlined />} type="primary" onClick={() => message.info("请使用下方上传")}>
-						点击上传
+					<Button icon={<ReloadOutlined />} onClick={() => refreshFiles()}>
+						刷新
 					</Button>
 					<Upload
 						action="/admin/base/comm/upload"
@@ -108,7 +108,9 @@ export default function SpaceList() {
 							}
 						}}
 					>
-						<Button>上传文件</Button>
+						<Button type="primary" icon={<UploadOutlined />}>
+							点击上传
+						</Button>
 					</Upload>
 					<Popconfirm title="确定删除选中文件？" onConfirm={remove}>
 						<Button danger disabled={!selIds.length}>

@@ -102,9 +102,9 @@ export default function DictList() {
 		{ label: "ID", prop: "id", minWidth: 120 },
 		{ label: "值", prop: "value", minWidth: 200, showOverflowTooltip: true },
 		{ label: "备注", prop: "remark", showOverflowTooltip: true, minWidth: 170 },
-		{ label: "排序", prop: "orderNum", sortable: "desc", width: 100 },
 		{ label: "创建时间", prop: "createTime", sortable: "custom", minWidth: 170 },
 		{ label: "更新时间", prop: "updateTime", sortable: "custom", minWidth: 170 },
+		{ label: "排序", prop: "orderNum", sortable: "desc", width: 100 },
 		{ type: "op", width: 250, buttons: ["slot-add", "edit", "delete"] }
 	];
 

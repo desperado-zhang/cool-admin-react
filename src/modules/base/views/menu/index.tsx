@@ -90,8 +90,8 @@ export default function SysMenu() {
 				return perms.map((p) => <Tag key={p}>{p}</Tag>);
 			}
 		},
-		{ prop: "orderNum", label: "排序号", width: 100, sortable: "asc" },
 		{ prop: "updateTime", label: "更新时间", sortable: "custom", width: 170 },
+		{ prop: "orderNum", label: "排序号", width: 100, sortable: "asc" },
 		{
 			type: "op",
 			width: 250,
@@ -126,7 +126,7 @@ export default function SysMenu() {
 			prop: "isShow",
 			label: "是否显示",
 			value: true,
-			hidden: (scope) => scope.type == 2,
+			hidden: (scope) => scope.type != 1,
 			component: { name: "el-switch" }
 		},
 		{
@@ -138,7 +138,7 @@ export default function SysMenu() {
 		{
 			prop: "icon",
 			label: "图标",
-			hidden: (scope) => scope.type == 2,
+			hidden: (scope) => scope.type != 1,
 			component: { name: "cl-menu-icon", props: { showIcon: true } }
 		},
 		{
