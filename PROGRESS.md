@@ -100,6 +100,7 @@
 | U5 | **上游缺口**：nest 后端 menu/list 不提取 `prop` 参数（Vue 版发 `{prop, order}` 排序会 1003 core error） | 🚧 待 nest 修复 | React 侧按契约 1.1 命名发 `{order, sort}`（实测可用）；建议 nest list 同步提取 prop |
 | U6 | **上游种子差异**：官方 menu.json「部门列表」为 type=2 按钮（无独立菜单入口），nest 种子为 type=1 菜单（/sys/department）；官方 demo 侧边栏无部门列表项 | 🚧 待 nest 修复 | 前端行为以数据为准，无需改前端；建议 nest 种子对齐官方（部门列表改 type=2） |
 | U7 | **上游种子差异**：官方 menu.json「首页」isShow=false（侧边栏不显示首页入口），nest 种子 isShow=1（会显示） | 🚧 待 nest 修复 | 同上，建议 nest 种子对齐官方 |
+| U8 | **上游数据乱码**：admin 用户 name 字段双重编码乱码（seed.sql 导入时 mysql 客户端缺 --default-character-set=utf8mb4） | ✅ 已修复 | 运行库已 UPDATE 修复；nest README 导入命令已加字符集参数（未提交，待 nest 确认）；seed.sql 文件本身 UTF-8 正确；全页乱码扫描清零 |
 
 ## 五、决策记录（ADR）
 
