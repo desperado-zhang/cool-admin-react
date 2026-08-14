@@ -6,6 +6,11 @@ body,
 	padding: 0;
 }
 
+/* AntD App 容器透传高度（登录页等 height:100% 布局依赖） */
+#app > .ant-app {
+	height: 100%;
+}
+
 * {
 	box-sizing: border-box;
 }
